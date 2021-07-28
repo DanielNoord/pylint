@@ -223,8 +223,14 @@ class Run(ConfigurationMixIn):
 
         if self.config.output_format == "vcg":
             writer.VCGWriter(self.config).write(diadefs)
+            os.remove(
+                f"{diadefs[0].title.strip().replace(' ', '_')}.{self.config.output_format}"
+            )
         else:
             writer.DotWriter(self.config).write(diadefs)
+            os.remove(
+                f"{diadefs[0].title.strip().replace(' ', '_')}.{self.config.output_format}"
+            )
         return 0
 
 
