@@ -3,7 +3,7 @@
 
 import sys
 from io import TextIOWrapper
-from typing import TYPE_CHECKING, Any, List, Optional, TextIO, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TextIO, Tuple
 
 from astroid import nodes
 
@@ -27,44 +27,69 @@ from pylint.interfaces import UNDEFINED, Confidence
 from pylint.message.message import Message
 from pylint.utils import get_module_and_frameid, get_rst_section, get_rst_title
 
+if sys.version_info >= (3, 8):
+    from typing import Literal, TypedDict
+else:
+    from typing_extensions import Literal, TypedDict
+
 if TYPE_CHECKING:
-    from pylint.lint.pylinter import PyLinter
+    from pylint.checkers import BaseChecker
+    from pylint.lint import PyLinter
     from pylint.message import MessageDefinition
+
+
+class CheckerDict(TypedDict):
+    checker: "BaseChecker"
+    options: List
+    msgs: Dict
+    reports: List
+
+
+ManagedMessage = Tuple[str, str, str, Optional[int], bool]
 
 
 class MessagesHandlerMixIn:
     """A mix-in class containing all the messages related methods for the main lint class."""
 
-    __by_id_managed_msgs: List[Tuple[str, str, str, int, bool]] = []
+    __by_id_managed_msgs: List[ManagedMessage] = []
 
-    def __init__(self):
-        self._msgs_state = {}
+    def __init__(self) -> None:
+        self._msgs_state: Dict[str, bool] = {}
         self.msg_status = 0
 
-    def _checker_messages(self, checker):
-        for known_checker in self._checkers[checker.lower()]:
-            yield from known_checker.msgs
-
     @classmethod
-    def clear_by_id_managed_msgs(cls):
+    def clear_by_id_managed_msgs(cls) -> None:
         cls.__by_id_managed_msgs.clear()
 
     @classmethod
-    def get_by_id_managed_msgs(cls):
+    def get_by_id_managed_msgs(cls) -> List[ManagedMessage]:
         return cls.__by_id_managed_msgs
 
-    def _register_by_id_managed_msg(self, msgid_or_symbol: str, line, is_disabled=True):
+    def _register_by_id_managed_msg(
+        self,
+        msgid_or_symbol: str,
+        line: Optional[int],
+        is_disabled: bool = True,
+    ) -> None:
         """If the msgid is a numeric one, then register it to inform the user
         it could furnish instead a symbolic msgid."""
         if msgid_or_symbol[1:].isdigit():
             try:
-                symbol = self.msgs_store.message_id_store.get_symbol(msgid=msgid_or_symbol)  # type: ignore
+                symbol = self.msgs_store.message_id_store.get_symbol(
+                    msgid=msgid_or_symbol
+                )
             except UnknownMessageError:
                 return
-            managed = (self.current_name, msgid_or_symbol, symbol, line, is_disabled)  # type: ignore
+            managed = (self.current_name, msgid_or_symbol, symbol, line, is_disabled)
             MessagesHandlerMixIn.__by_id_managed_msgs.append(managed)
 
-    def disable(self, msgid, scope="package", line=None, ignore_unknown=False):
+    def disable(
+        self,
+        msgid: str,
+        scope="package",
+        line: Optional[int] = None,
+        ignore_unknown: bool = False,
+    ) -> None:
         self._set_msg_status(
             msgid, enable=False, scope=scope, line=line, ignore_unknown=ignore_unknown
         )
@@ -74,9 +99,9 @@ class MessagesHandlerMixIn:
         self,
         msgid: str,
         scope: str = "package",
-        line: Union[bool, int, None] = None,
+        line: Optional[int] = None,
         ignore_unknown: bool = False,
-    ):
+    ) -> None:
         if not line:
             raise NoLineSuppliedError
         self._set_msg_status(
@@ -88,15 +113,26 @@ class MessagesHandlerMixIn:
         )
         self._register_by_id_managed_msg(msgid, line + 1)
 
-    def enable(self, msgid, scope="package", line=None, ignore_unknown=False):
+    def enable(
+        self,
+        msgid: str,
+        scope: str = "package",
+        line: Optional[int] = None,
+        ignore_unknown: bool = False,
+    ) -> None:
         self._set_msg_status(
             msgid, enable=True, scope=scope, line=line, ignore_unknown=ignore_unknown
         )
         self._register_by_id_managed_msg(msgid, line, is_disabled=False)
 
     def _set_msg_status(
-        self, msgid, enable, scope="package", line=None, ignore_unknown=False
-    ):
+        self,
+        msgid: str,
+        enable: bool,
+        scope: str = "package",
+        line: Optional[int] = None,
+        ignore_unknown: bool = False,
+    ) -> None:
         assert scope in ("package", "module")
         if msgid == "all":
             for _msgid in MSG_TYPES:
@@ -106,8 +142,8 @@ class MessagesHandlerMixIn:
         # msgid is a category?
         category_id = msgid.upper()
         if category_id not in MSG_TYPES:
-            category_id = MSG_TYPES_LONG.get(category_id)
-        if category_id is not None:
+            category_id = MSG_TYPES_LONG.get(category_id, "")
+        if category_id != "":
             for _msgid in self.msgs_store._msgs_by_category.get(category_id):
                 self._set_msg_status(_msgid, enable, scope, line)
             return
@@ -137,7 +173,13 @@ class MessagesHandlerMixIn:
         for message_definition in message_definitions:
             self._set_one_msg_status(scope, message_definition, line, enable)
 
-    def _set_one_msg_status(self, scope, msg, line, enable):
+    def _set_one_msg_status(
+        self,
+        scope: str,
+        msg: "MessageDefinition",
+        line: Optional[int],
+        enable: bool,
+    ) -> None:
         if scope == "module":
             self.file_state.set_msg_status(msg, line, enable)
             if not enable and msg.symbol != "locally-disabled":
@@ -157,7 +199,7 @@ class MessagesHandlerMixIn:
                 if not val
             ]
 
-    def _message_symbol(self, msgid):
+    def _message_symbol(self, msgid: str) -> List[str]:
         """Get the message symbol of the given message id
 
         Return the original message id if the message does not
@@ -166,20 +208,32 @@ class MessagesHandlerMixIn:
         try:
             return [md.symbol for md in self.msgs_store.get_message_definitions(msgid)]
         except UnknownMessageError:
-            return msgid
+            return [msgid]
 
-    def get_message_state_scope(self, msgid, line=None, confidence=UNDEFINED):
+    def get_message_state_scope(
+        self,
+        msgid: str,
+        line: Optional[int] = None,
+        confidence: Optional[Confidence] = None,
+    ) -> Optional[Literal[0, 1, 2]]:
         """Returns the scope at which a message was enabled/disabled."""
+        if confidence is None:
+            confidence = UNDEFINED
         if self.config.confidence and confidence.name not in self.config.confidence:
-            return MSG_STATE_CONFIDENCE
+            return MSG_STATE_CONFIDENCE  # type: ignore # mypy does not infer Literal correctly
         try:
             if line in self.file_state._module_msgs_state[msgid]:
-                return MSG_STATE_SCOPE_MODULE
+                return MSG_STATE_SCOPE_MODULE  # type: ignore
         except (KeyError, TypeError):
-            return MSG_STATE_SCOPE_CONFIG
+            return MSG_STATE_SCOPE_CONFIG  # type: ignore
         return None
 
-    def is_message_enabled(self, msg_descr, line=None, confidence=None):
+    def is_message_enabled(
+        self,
+        msg_descr: str,
+        line: Optional[int] = None,
+        confidence: Optional[Confidence] = None,
+    ) -> bool:
         """return true if the message associated to the given message id is
         enabled
 
@@ -201,7 +255,7 @@ class MessagesHandlerMixIn:
                 return True
         return False
 
-    def is_one_message_enabled(self, msgid, line):
+    def is_one_message_enabled(self, msgid: str, line: Optional[int]) -> bool:
         if line is None:
             return self._msgs_state.get(msgid, True)
         try:
@@ -283,7 +337,11 @@ class MessagesHandlerMixIn:
             )
 
     @staticmethod
-    def check_message_definition(message_definition, line, node):
+    def check_message_definition(
+        message_definition: "MessageDefinition",
+        line: Optional[int],
+        node: Optional[nodes.NodeNG],
+    ) -> None:
         if message_definition.msgid[0] not in _SCOPE_EXEMPT:
             # Fatal messages and reports are special, the node/scope distinction
             # does not apply to them.
@@ -376,7 +434,7 @@ class MessagesHandlerMixIn:
         )
 
     def _get_checkers_infos(self):
-        by_checker = {}
+        by_checker: Dict[str, CheckerDict] = {}
         for checker in self.get_checkers():
             name = checker.name
             if name != "master":
@@ -394,7 +452,7 @@ class MessagesHandlerMixIn:
                     }
         return by_checker
 
-    def get_checkers_documentation(self):
+    def get_checkers_documentation(self) -> str:
         result = get_rst_title("Pylint global options and switches", "-")
         result += """
 Pylint provides global options and switches.
