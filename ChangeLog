@@ -11,6 +11,10 @@ Release date: TBA
 ..
   Put new features here and also in 'doc/whatsnew/2.12.rst'
 
+* Fix bug with importing namespace packages with relative imports
+
+  Closes #5059
+
 * Improve and flatten ``unused-wildcard-import`` message
 
   Closes #3859
