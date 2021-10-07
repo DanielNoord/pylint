@@ -159,6 +159,15 @@ class TestImportsChecker(CheckerTestCase):
         assert len(output.readlines()) == len(output2.readlines())
         assert errors.readlines() == errors2.readlines()
 
+    @staticmethod
+    def test_relative_beyond_top_level_three() -> None:
+        output, errors = lint.py_run(
+            f"{os.path.join(REGR_DATA, 'beyond_top_three/a.py')} -d all -e relative-beyond-top-level",
+            return_std=True,
+        )
+        assert len(output.readlines()) == 5
+        assert errors.readlines() == []
+
     def test_wildcard_import_init(self) -> None:
         module = astroid.MANAGER.ast_from_module_name("init_wildcard", REGR_DATA)
         import_from = module.body[0]
