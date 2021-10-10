@@ -66,7 +66,7 @@ from pylint.lint import ArgumentPreprocessingError, PyLinter, Run, preprocess_op
 from pylint.message import Message
 from pylint.reporters import text
 from pylint.typing import MessageLocationTuple
-from pylint.utils import FileState, tokenize_module
+from pylint.utils import FileState, print_full_documentation, tokenize_module
 
 if os.name == "java":
     # pylint: disable=no-member
@@ -316,14 +316,14 @@ def test_message_state_scope(init_linter: PyLinter) -> None:
 
     linter = init_linter
     linter.disable("C0202")
-    assert MSG_STATE_SCOPE_CONFIG == linter.get_message_state_scope("C0202")
+    assert MSG_STATE_SCOPE_CONFIG == linter._get_message_state_scope("C0202")
     linter.disable("W0101", scope="module", line=3)
-    assert MSG_STATE_SCOPE_CONFIG == linter.get_message_state_scope("C0202")
-    assert MSG_STATE_SCOPE_MODULE == linter.get_message_state_scope("W0101", 3)
+    assert MSG_STATE_SCOPE_CONFIG == linter._get_message_state_scope("C0202")
+    assert MSG_STATE_SCOPE_MODULE == linter._get_message_state_scope("W0101", 3)
     linter.enable("W0102", scope="module", line=3)
-    assert MSG_STATE_SCOPE_MODULE == linter.get_message_state_scope("W0102", 3)
+    assert MSG_STATE_SCOPE_MODULE == linter._get_message_state_scope("W0102", 3)
     linter.config = FakeConfig()
-    assert MSG_STATE_CONFIDENCE == linter.get_message_state_scope(
+    assert MSG_STATE_CONFIDENCE == linter._get_message_state_scope(
         "this-is-bad", confidence=interfaces.INFERENCE
     )
 
@@ -621,7 +621,7 @@ def test_analyze_explicit_script(linter: PyLinter) -> None:
 
 def test_full_documentation(linter: PyLinter) -> None:
     out = StringIO()
-    linter.print_full_documentation(out)
+    print_full_documentation(linter, out)
     output = out.getvalue()
     # A few spot checks only
     for re_str in (

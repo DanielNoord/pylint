@@ -15,9 +15,24 @@ Release date: TBA
 
   Closes #5059
 
+* Properly identify parameters with no documentation and add new message called ``missing-any-param-doc``
+
+  Closes #3799
+
+* Add checkers ``overridden-final-method`` & ``subclassed-final-class``
+
+  Closes #3197
+
+* Added support for ``ModuleNotFoundError`` (``import-error`` and ``no-name-in-module``).
+  ``ModuleNotFoundError`` inherits from ``ImportError`` and was added in Python ``3.6``
+
 * Improve and flatten ``unused-wildcard-import`` message
 
   Closes #3859
+
+* In length checker, ``len-as-condition`` has been renamed as
+  ``use-implicit-booleaness-not-len`` in order to be consistent with
+  ``use-implicit-booleaness-not-comparison``.
 
 
 What's New in Pylint 2.11.2?
@@ -87,6 +102,16 @@ Release date: TBA
 * Fix regression on Compare node inference
 
   Closes #5048
+
+* Fix false-positive ``isinstance-second-argument-not-valid-type`` with ``typing.Callable``.
+
+  Closes #3507
+  Closes #5087
+
+* ``TypingChecker``
+
+  * Fix false-negative for ``deprecated-typing-alias`` and ``consider-using-alias``
+    with ``typing.Type`` + ``typing.Callable``.
 
 
 What's New in Pylint 2.11.1?
