@@ -38,7 +38,7 @@ cmd = "pre-commit run --all-files||echo 'Hack so this command does not fail'"
 
 [[before_commit]]
 name = "Acceptance tests"
-cmd = "pytest -m acceptance"
+cmd = "pytest -m primer"
 
 # Or run some commands after the git tag and the branch
 # have been pushed:
