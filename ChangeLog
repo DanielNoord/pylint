@@ -1415,7 +1415,14 @@ Release date: 2020-04-27
 
 * Fix a false negative for ``undefined-variable`` when using class attribute in comprehension.
 
+<<<<<<< HEAD
   Close #3494
+=======
+* Fix a false positive of ``invalid-name`` on TypeVar.
+  Close #3401
+
+* Don't emit ``continue-in-finally`` in Python 3.8 or higher.
+>>>>>>> 59e2502d71fd0c66ad8b722c6bb1855d47843de2
 
 * Fix a false positive for ``undefined-variable`` when using class attribute in decorator or as type hint.
 

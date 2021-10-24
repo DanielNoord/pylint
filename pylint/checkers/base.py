@@ -110,6 +110,7 @@ class NamingStyle:
         return {
             "module": cls.MOD_NAME_RGX,
             "const": cls.CONST_NAME_RGX,
+            "typevar": cls.TYPE_VAR_RGX,
             "class": cls.CLASS_NAME_RGX,
             "function": cls.DEFAULT_NAME_RGX,
             "method": cls.DEFAULT_NAME_RGX,
@@ -125,6 +126,7 @@ class NamingStyle:
 class SnakeCaseStyle(NamingStyle):
     """Regex rules for snake_case naming style."""
 
+    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z][^\WA-Z]*$")
     CLASS_NAME_RGX = re.compile(r"[^\W\dA-Z][^\WA-Z]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\dA-Z][^\WA-Z]*$")
     CONST_NAME_RGX = re.compile(r"([^\W\dA-Z][^\WA-Z]*|__.*__)$")
@@ -138,6 +140,7 @@ class SnakeCaseStyle(NamingStyle):
 class CamelCaseStyle(NamingStyle):
     """Regex rules for camelCase naming style."""
 
+    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z][^\W_]*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]*$")
     CONST_NAME_RGX = re.compile(r"([^\W\dA-Z][^\W_]*|__.*__)$")
@@ -149,6 +152,7 @@ class CamelCaseStyle(NamingStyle):
 class PascalCaseStyle(NamingStyle):
     """Regex rules for PascalCase naming style."""
 
+    TYPE_VAR_RGX = re.compile(r"[^\W\da-z][^\W_]*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     CONST_NAME_RGX = re.compile(r"([^\W\da-z][^\W_]*|__.*__)$")
@@ -160,6 +164,7 @@ class PascalCaseStyle(NamingStyle):
 class UpperCaseStyle(NamingStyle):
     """Regex rules for UPPER_CASE naming style."""
 
+    TYPE_VAR_RGX = re.compile(r"[^\W\da-z][^\Wa-z]*$")
     CLASS_NAME_RGX = re.compile(r"[^\W\da-z][^\Wa-z]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\da-z][^\Wa-z]+$")
     CONST_NAME_RGX = re.compile(r"([^\W\da-z][^\Wa-z]*|__.*__)$")
@@ -219,6 +224,7 @@ COMPARISON_OPERATORS = frozenset(("==", "!=", "<", ">", "<=", ">="))
 # List of methods which can be redefined
 REDEFINABLE_METHODS = frozenset(("__module__",))
 TYPING_FORWARD_REF_QNAME = "typing.ForwardRef"
+TYPING_TYPE_VAR_QNAME = "typing.TypeVar"
 
 
 def _redefines_import(node):
@@ -1657,6 +1663,7 @@ class BasicChecker(_BasicChecker):
 KNOWN_NAME_TYPES = {
     "module",
     "const",
+    "typevar",
     "class",
     "function",
     "method",
@@ -1671,6 +1678,7 @@ KNOWN_NAME_TYPES = {
 HUMAN_READABLE_TYPES = {
     "module": "module",
     "const": "constant",
+    "typevar": "type variable",
     "class": "class",
     "function": "function",
     "method": "method",
@@ -1685,6 +1693,7 @@ HUMAN_READABLE_TYPES = {
 DEFAULT_NAMING_STYLES = {
     "module": "snake_case",
     "const": "UPPER_CASE",
+    "typevar": "PascalCase",
     "class": "PascalCase",
     "function": "snake_case",
     "method": "snake_case",
@@ -1865,6 +1874,8 @@ class NameChecker(_BasicChecker):
         self._bad_names_rgxs_compiled = [
             re.compile(rgxp) for rgxp in self.config.bad_names_rgxs
         ]
+
+        self._typevar_naming_style = getattr(self.config, "typevar_naming_style")
 
     def _create_naming_rules(self):
         regexps = {}
@@ -2070,6 +2081,7 @@ class NameChecker(_BasicChecker):
             self.linter.stats.increase_bad_name(node_type, 1)
             self.add_message("disallowed-name", node=node, args=name)
             return
+
         regexp = self._name_regexps[node_type]
         match = regexp.match(name)
 
@@ -2081,6 +2093,9 @@ class NameChecker(_BasicChecker):
 
         if match is None and not _should_exempt_from_invalid_name(node):
             self._raise_name_warning(None, node, node_type, name, confidence)
+
+        if match is not None and node_type == "typevar":
+            self._check_typevar_variance(name, node)
 
     def _check_assign_to_new_keyword_violation(self, name, node):
         keyword_first_version = self._name_became_keyword_in_version(
@@ -2100,6 +2115,58 @@ class NameChecker(_BasicChecker):
             if name in keywords and sys.version_info < version:
                 return ".".join(str(v) for v in version)
         return None
+
+    @staticmethod
+    def _assigned_typevar(node):
+        if isinstance(node, astroid.Call):
+            inferred = utils.safe_infer(node.func)
+            if (
+                inferred
+                and isinstance(inferred, astroid.ClassDef)
+                and inferred.qname() == TYPING_TYPE_VAR_QNAME
+            ):
+                return True
+        return False
+
+    def _check_typevar_variance(self, name, node):
+        if self._typevar_naming_style == "UPPER_CASE":
+            _co, _contra = "_CO", "_CONTRA"
+        else:
+            _co, _contra = "_co", "_contra"
+
+        keywords = node.assign_type().value.keywords
+        if keywords:
+            for kw in keywords:
+                if kw.arg == "covariant" and kw.value.value and not name.endswith(_co):
+                    suggest_name = "".join((name.rsplit("_", 1)[0], _co))
+                    self.add_message(
+                        "bad-typevar-name",
+                        node=node,
+                        args=(name, "covariant", suggest_name),
+                        confidence=interfaces.HIGH,
+                    )
+                    return
+                if (
+                    kw.arg == "contravariant"
+                    and kw.value.value
+                    and not name.endswith(_contra)
+                ):
+                    suggest_name = "".join((name.rsplit("_", 1)[0], _contra))
+                    self.add_message(
+                        "bad-typevar-name",
+                        node=node,
+                        args=(name, "contravariant", suggest_name),
+                        confidence=interfaces.HIGH,
+                    )
+                    return
+        elif name.endswith(_co) or name.endswith(_contra):
+            suggest_name = name.rsplit("_", 1)[0]
+            self.add_message(
+                "bad-typevar-name",
+                node=node,
+                args=(name, "invariant", suggest_name),
+                confidence=interfaces.HIGH,
+            )
 
 
 class DocStringChecker(_BasicChecker):
