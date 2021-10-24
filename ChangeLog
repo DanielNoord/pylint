@@ -91,6 +91,14 @@ Release date: TBA
 
   Closes #4426
 
+* Added new checker ``typevar-name-missing-variance``. Emitted when a covariant
+  or contravariant ``TypeVar`` does not include  ``_co`` or ``_contra`` respectively.
+
+* ``invalid-name`` check now also checks ``TypeVar`` for a pattern set with the new option
+  ``--typevar-rgx`` option or the chosen naming style.
+
+  Closes #3401
+
 * Fix ``missing-function-docstring`` not being able to check ``__init__`` and other
   magic methods even if the ``no-docstring-rgx`` setting was set to do so
 
@@ -1415,14 +1423,7 @@ Release date: 2020-04-27
 
 * Fix a false negative for ``undefined-variable`` when using class attribute in comprehension.
 
-<<<<<<< HEAD
   Close #3494
-=======
-* Fix a false positive of ``invalid-name`` on TypeVar.
-  Close #3401
-
-* Don't emit ``continue-in-finally`` in Python 3.8 or higher.
->>>>>>> 59e2502d71fd0c66ad8b722c6bb1855d47843de2
 
 * Fix a false positive for ``undefined-variable`` when using class attribute in decorator or as type hint.
 

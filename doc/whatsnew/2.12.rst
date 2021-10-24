@@ -43,6 +43,9 @@ New checkers
 
   Closes #4774
 
+* Added new checker ``typevar-name-missing-variance``. Emitted when a covariant
+  or contravariant ``TypeVar`` does not include  ``_co`` or ``_contra`` respectively.
+
 
 Removed checkers
 ================
@@ -58,6 +61,9 @@ Other Changes
 * Improve and flatten ``unused-wildcard-import`` message
 
   Closes #3859
+
+* ``invalid-name`` check now also checks ``TypeVar`` for a pattern set with the new option
+  ``--typevar-rgx`` option.
 
 * In length checker, ``len-as-condition`` has been renamed as
   ``use-implicit-booleaness-not-len`` in order to be consistent with

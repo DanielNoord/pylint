@@ -72,6 +72,7 @@ from typing import Any, Dict, Iterator, Optional, Pattern, cast
 
 import astroid
 from astroid import nodes
+from astroid.nodes.node_classes import Assign
 
 from pylint import checkers, interfaces
 from pylint import utils as lint_utils
@@ -104,6 +105,7 @@ class NamingStyle:
     COMP_VAR_RGX: Pattern[str] = ANY
     DEFAULT_NAME_RGX: Pattern[str] = ANY
     CLASS_ATTRIBUTE_RGX: Pattern[str] = ANY
+    TYPE_VAR_RGX: Pattern[str] = ANY
 
     @classmethod
     def get_regex(cls, name_type):
@@ -120,6 +122,7 @@ class NamingStyle:
             "class_attribute": cls.CLASS_ATTRIBUTE_RGX,
             "class_const": cls.CONST_NAME_RGX,
             "inlinevar": cls.COMP_VAR_RGX,
+            "typevar": cls.TYPE_VAR_RGX,
         }[name_type]
 
 
@@ -140,7 +143,7 @@ class SnakeCaseStyle(NamingStyle):
 class CamelCaseStyle(NamingStyle):
     """Regex rules for camelCase naming style."""
 
-    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z][^\W_]*(_co(ntra)?)?$")
+    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z]_*[^\W_]*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]*$")
     CONST_NAME_RGX = re.compile(r"([^\W\dA-Z][^\W_]*|__.*__)$")
@@ -152,7 +155,7 @@ class CamelCaseStyle(NamingStyle):
 class PascalCaseStyle(NamingStyle):
     """Regex rules for PascalCase naming style."""
 
-    TYPE_VAR_RGX = re.compile(r"[^\W\da-z][^\W_]*(_co(ntra)?)?$")
+    TYPE_VAR_RGX = re.compile(r"[^\W\da-z]_*[^\W_]*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     CONST_NAME_RGX = re.compile(r"([^\W\da-z][^\W_]*|__.*__)$")
@@ -1756,6 +1759,15 @@ class NameChecker(_BasicChecker):
                 ]
             },
         ),
+        "C0105": (
+            'Type variable "%s" is %s, use "%s" instead',
+            "typevar-name-missing-variance",
+            "Emitted when a TypeVar name doesn't reflect its type variant. "
+            "According to PEP8, It is recommended to add suffixes '_co' and "
+            "'_contra' to the variables used to declare covariant or "
+            "contravariant behavior respectively. Invariant (default) variables "
+            "do not require a suffix.",
+        ),
         "C0144": (
             '%s name "%s" contains a non-ASCII unicode character',
             "non-ascii-name",
@@ -1875,8 +1887,6 @@ class NameChecker(_BasicChecker):
             re.compile(rgxp) for rgxp in self.config.bad_names_rgxs
         ]
 
-        self._typevar_naming_style = getattr(self.config, "typevar_naming_style")
-
     def _create_naming_rules(self):
         regexps = {}
         hints = {}
@@ -1899,7 +1909,12 @@ class NameChecker(_BasicChecker):
 
         return regexps, hints
 
-    @utils.check_messages("disallowed-name", "invalid-name", "non-ascii-name")
+    @utils.check_messages(
+        "disallowed-name",
+        "invalid-name",
+        "non-ascii-name",
+        "typevar-name-missing-variance",
+    )
     def visit_module(self, node: nodes.Module) -> None:
         self._check_name("module", node.name.split(".")[-1], node)
         self._bad_names = {}
@@ -1978,6 +1993,8 @@ class NameChecker(_BasicChecker):
         self._check_assign_to_new_keyword_violation(node.name, node)
         frame = node.frame()
         assign_type = node.assign_type()
+        parent_node = node.parent
+
         if isinstance(assign_type, nodes.Comprehension):
             self._check_name("inlinevar", node.name, node)
         elif isinstance(frame, nodes.Module):
@@ -2011,6 +2028,7 @@ class NameChecker(_BasicChecker):
                         break
                 else:
                     self._check_name("class_attribute", node.name, node)
+
 
     def _recursive_check_names(self, args):
         """check names in a possibly recursive list <arg>"""
