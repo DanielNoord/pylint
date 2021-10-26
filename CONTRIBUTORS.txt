@@ -390,6 +390,8 @@ contributors:
 
 * Ram Rachum (cool-RR)
 
+* D. Alphus (Alphadelta14): contributor
+
 * Pieter Engelbrecht
 
 * Ethan Leba: contributor
@@ -560,3 +562,11 @@ contributors:
 * Youngsoo Sung: contributor
 
 * Nuzula H. Yudaka (Nuzhuka): contributor
+
+* Arianna Yang: contributor
+
+* Samuel Freilich (sfreilich): contributor
+
+* Mike Fiedler (miketheman): contributor
+
+* Takahide Nojima: contributor

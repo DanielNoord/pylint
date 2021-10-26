@@ -46,6 +46,11 @@ New checkers
 * Added new checker ``typevar-name-missing-variance``. Emitted when a covariant
   or contravariant ``TypeVar`` does not include  ``_co`` or ``_contra`` respectively.
 
+* Added configuration option ``exclude-too-few-public-methods`` to allow excluding
+  classes from the ``min-public-methods`` checker.
+
+  Closes #3370
+
 
 Removed checkers
 ================
@@ -53,10 +58,16 @@ Removed checkers
 
 Extensions
 ==========
+* Added an optional extension ``consider-using-any-or-all``: Emitted when a ``for`` loop only
+  produces a boolean and could be replaced by ``any`` or ``all`` using a generator. Also suggests
+  a suitable any/all statement if it is concise.
 
+  Closes #5008
 
 Other Changes
 =============
+
+* Fix exception when pyreverse parses ``property function`` of a class.
 
 * Improve and flatten ``unused-wildcard-import`` message
 
@@ -88,9 +99,22 @@ Other Changes
 
   Closes #3771
 
+* ``undefined-variable`` and ``unused-variable`` now correctly trigger for assignment expressions
+  in functions defaults
+
+  Fixes part of #3688
+
+* ``undefined-variable`` now correctly triggers for assignment expressions in if ... else statements
+  This includes a basic form of control flow inference for if ... else statements using
+  constant boolean values
+
+  Closes #3688
+
 * Fix double emitting of ``not-callable`` on inferrable ``properties``
 
   Closes #4426
+
+* Support configuring mixin class pattern via ``mixin-class-rgx``
 
 * Normalize the input to the ``ignore-paths`` option to allow both Posix and
   Windows paths

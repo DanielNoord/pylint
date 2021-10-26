@@ -1211,6 +1211,12 @@ class VariablesChecker(BaseChecker):
                         )
                     if is_first_level_ref:
                         break
+                elif isinstance(defnode, nodes.NamedExpr):
+                    if isinstance(defnode.parent, nodes.IfExp):
+                        if self._is_never_evaluated(defnode, defnode.parent):
+                            self.add_message(
+                                "undefined-variable", node=node, args=node.name
+                            )
 
             current_consumer.mark_as_consumed(node.name, found_nodes)
             # check it's not a loop variable used outside the loop
@@ -1635,6 +1641,21 @@ class VariablesChecker(BaseChecker):
                 return 2
         return 0
 
+    @staticmethod
+    def _is_never_evaluated(
+        defnode: nodes.NamedExpr, defnode_parent: nodes.IfExp
+    ) -> bool:
+        """Check if a NamedExpr is inside a side of if ... else that never
+        gets evaluated
+        """
+        inferred_test = utils.safe_infer(defnode_parent.test)
+        if isinstance(inferred_test, nodes.Const):
+            if inferred_test.value is True and defnode == defnode_parent.orelse:
+                return True
+            if inferred_test.value is False and defnode == defnode_parent.body:
+                return True
+        return False
+
     def _ignore_class_scope(self, node):
         """
         Return True if the node is in a local class scope, as an assignment.
@@ -1951,23 +1972,24 @@ class VariablesChecker(BaseChecker):
     def _allowed_redefined_builtin(self, name):
         return name in self.config.allowed_redefined_builtins
 
-    def _has_homonym_in_upper_function_scope(self, node, index):
+    def _has_homonym_in_upper_function_scope(
+        self, node: nodes.Name, index: int
+    ) -> bool:
         """
-        Return True if there is a node with the same name in the to_consume dict of an upper scope
-        and if that scope is a function
+        Return whether there is a node with the same name in the
+        to_consume dict of an upper scope and if that scope is a
+        function
 
         :param node: node to check for
-        :type node: astroid.Node
         :param index: index of the current consumer inside self._to_consume
-        :type index: int
-        :return: True if there is a node with the same name in the to_consume dict of an upper scope
-                 and if that scope is a function
-        :rtype: bool
+        :return: True if there is a node with the same name in the
+                 to_consume dict of an upper scope and if that scope
+                 is a function, False otherwise
         """
-        for _consumer in self._to_consume[index - 1 :: -1]:
-            if _consumer.scope_type == "function" and node.name in _consumer.to_consume:
-                return True
-        return False
+        return any(
+            _consumer.scope_type == "function" and node.name in _consumer.to_consume
+            for _consumer in self._to_consume[index - 1 :: -1]
+        )
 
     def _store_type_annotation_node(self, type_annotation):
         """Given a type annotation, store all the name nodes it refers to"""
