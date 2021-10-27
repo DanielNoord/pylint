@@ -603,17 +603,19 @@ class TestNamePresets(unittest.TestCase):
         SNAKE_CASE_NAMES | CAMEL_CASE_NAMES | UPPER_CASE_NAMES | PASCAL_CASE_NAMES
     )
 
-    def _test_name_is_correct_for_all_name_types(
+    def _test_name_is_correct_for_all_name_types_except_typevar(
         self, naming_style: Type[base.NamingStyle], name: str
     ) -> None:
         for name_type in base.KNOWN_NAME_TYPES:
-            self._test_is_correct(naming_style, name, name_type)
+            if name_type != "typevar":
+                self._test_is_correct(naming_style, name, name_type)
 
-    def _test_name_is_incorrect_for_all_name_types(
+    def _test_name_is_incorrect_for_all_name_types_except_type_var(
         self, naming_style: Type[base.NamingStyle], name: str
     ) -> None:
         for name_type in base.KNOWN_NAME_TYPES:
-            self._test_is_incorrect(naming_style, name, name_type)
+            if name_type != "typevar":
+                self._test_is_incorrect(naming_style, name, name_type)
 
     def _test_should_always_pass(self, naming_style: Type[base.NamingStyle]) -> None:
         always_pass_data = [
@@ -645,9 +647,13 @@ class TestNamePresets(unittest.TestCase):
         naming_style = base.SnakeCaseStyle
 
         for name in self.SNAKE_CASE_NAMES:
-            self._test_name_is_correct_for_all_name_types(naming_style, name)
+            self._test_name_is_correct_for_all_name_types_except_typevar(
+                naming_style, name
+            )
         for name in self.ALL_NAMES - self.SNAKE_CASE_NAMES:
-            self._test_name_is_incorrect_for_all_name_types(naming_style, name)
+            self._test_name_is_incorrect_for_all_name_types_except_type_var(
+                naming_style, name
+            )
 
         self._test_should_always_pass(naming_style)
 
@@ -655,9 +661,13 @@ class TestNamePresets(unittest.TestCase):
         naming_style = base.CamelCaseStyle
 
         for name in self.CAMEL_CASE_NAMES:
-            self._test_name_is_correct_for_all_name_types(naming_style, name)
+            self._test_name_is_correct_for_all_name_types_except_typevar(
+                naming_style, name
+            )
         for name in self.ALL_NAMES - self.CAMEL_CASE_NAMES:
-            self._test_name_is_incorrect_for_all_name_types(naming_style, name)
+            self._test_name_is_incorrect_for_all_name_types_except_type_var(
+                naming_style, name
+            )
 
         self._test_should_always_pass(naming_style)
 
@@ -665,10 +675,16 @@ class TestNamePresets(unittest.TestCase):
         naming_style = base.UpperCaseStyle
 
         for name in self.UPPER_CASE_NAMES:
-            self._test_name_is_correct_for_all_name_types(naming_style, name)
+            self._test_name_is_correct_for_all_name_types_except_typevar(
+                naming_style, name
+            )
         for name in self.ALL_NAMES - self.UPPER_CASE_NAMES:
-            self._test_name_is_incorrect_for_all_name_types(naming_style, name)
-        self._test_name_is_incorrect_for_all_name_types(naming_style, "UPPERcase")
+            self._test_name_is_incorrect_for_all_name_types_except_type_var(
+                naming_style, name
+            )
+        self._test_name_is_incorrect_for_all_name_types_except_type_var(
+            naming_style, "UPPERcase"
+        )
 
         self._test_should_always_pass(naming_style)
 
@@ -676,9 +692,13 @@ class TestNamePresets(unittest.TestCase):
         naming_style = base.PascalCaseStyle
 
         for name in self.PASCAL_CASE_NAMES:
-            self._test_name_is_correct_for_all_name_types(naming_style, name)
+            self._test_name_is_correct_for_all_name_types_except_typevar(
+                naming_style, name
+            )
         for name in self.ALL_NAMES - self.PASCAL_CASE_NAMES:
-            self._test_name_is_incorrect_for_all_name_types(naming_style, name)
+            self._test_name_is_incorrect_for_all_name_types_except_type_var(
+                naming_style, name
+            )
 
         self._test_should_always_pass(naming_style)
 

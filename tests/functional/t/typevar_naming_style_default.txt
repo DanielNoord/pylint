@@ -1,0 +1,11 @@
+typevar-name-missing-variance:7:0::"Type variable ""T_GoodNameWithoutContra"" is contravariant, use ""T_contra"" instead":HIGH
+invalid-name:14:0::"Type variable name ""BadName"" doesn't conform to PascalCase naming style":HIGH
+invalid-name:15:0::"Type variable name ""BadNameWithoutContra"" doesn't conform to PascalCase naming style":HIGH
+typevar-name-missing-variance:15:0::"Type variable ""BadNameWithoutContra"" is contravariant, use ""BadNameWithoutContra_contra"" instead":HIGH
+invalid-name:18:0::"Type variable name ""BadName_co"" doesn't conform to PascalCase naming style":HIGH
+invalid-name:19:0::"Type variable name ""BadName_contra"" doesn't conform to PascalCase naming style":HIGH
+invalid-name:22:0::"Type variable name ""T_goodName"" doesn't conform to PascalCase naming style":HIGH
+invalid-name:23:0::"Type variable name ""T_goodNameWithoutContra"" doesn't conform to PascalCase naming style":HIGH
+typevar-name-missing-variance:23:0::"Type variable ""T_goodNameWithoutContra"" is contravariant, use ""T_contra"" instead":HIGH
+invalid-name:26:0::"Type variable name ""T_goodName_co"" doesn't conform to PascalCase naming style":HIGH
+invalid-name:27:0::"Type variable name ""T_goodName_contra"" doesn't conform to PascalCase naming style":HIGH

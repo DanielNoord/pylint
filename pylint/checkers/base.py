@@ -68,7 +68,7 @@ import collections
 import itertools
 import re
 import sys
-from typing import Any, Dict, Iterator, Optional, Pattern, cast
+from typing import Any, Dict, Iterator, Optional, Pattern, Tuple, cast
 
 import astroid
 from astroid import nodes
@@ -141,7 +141,7 @@ class SnakeCaseStyle(NamingStyle):
 class CamelCaseStyle(NamingStyle):
     """Regex rules for camelCase naming style."""
 
-    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z]_*[^\W_]*(_co(ntra)?)?$")
+    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z]+_[^\W_]*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]*$")
     CONST_NAME_RGX = re.compile(r"([^\W\dA-Z][^\W_]*|__.*__)$")
@@ -153,7 +153,7 @@ class CamelCaseStyle(NamingStyle):
 class PascalCaseStyle(NamingStyle):
     """Regex rules for PascalCase naming style."""
 
-    TYPE_VAR_RGX = re.compile(r"[^\W\da-z]_*[^\W_]*(_co(ntra)?)?$")
+    TYPE_VAR_RGX = re.compile(r"[^\W\da-z]+?_?([^\W\da-z_][^\WA-Z_]+)*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     CONST_NAME_RGX = re.compile(r"([^\W\da-z][^\W_]*|__.*__)$")
@@ -1881,6 +1881,7 @@ class NameChecker(_BasicChecker):
         self._bad_names_rgxs_compiled = [
             re.compile(rgxp) for rgxp in self.config.bad_names_rgxs
         ]
+        self._typevar_naming_style = get_global_option(self, "typevar_naming_style")
 
     def _create_naming_rules(self):
         regexps = {}
@@ -1908,7 +1909,6 @@ class NameChecker(_BasicChecker):
         "disallowed-name",
         "invalid-name",
         "non-ascii-name",
-        "typevar-name-missing-variance",
     )
     def visit_module(self, node: nodes.Module) -> None:
         self._check_name("module", node.name.split(".")[-1], node)
@@ -1981,36 +1981,50 @@ class NameChecker(_BasicChecker):
             self._check_name("const", name, node)
 
     @utils.check_messages(
-        "disallowed-name", "invalid-name", "assign-to-new-keyword", "non-ascii-name"
+        "disallowed-name",
+        "invalid-name",
+        "assign-to-new-keyword",
+        "non-ascii-name",
+        "typevar-name-missing-variance",
     )
     def visit_assignname(self, node: nodes.AssignName) -> None:
         """check module level assigned names"""
         self._check_assign_to_new_keyword_violation(node.name, node)
         frame = node.frame()
         assign_type = node.assign_type()
-        parent_node = node.parent
 
+        # Check names defined in comprehensions
         if isinstance(assign_type, nodes.Comprehension):
             self._check_name("inlinevar", node.name, node)
+
+        # Check names defined in module scope
         elif isinstance(frame, nodes.Module):
+            # Check names defined in Assign nodes
             if isinstance(assign_type, nodes.Assign):
-                if isinstance(utils.safe_infer(assign_type.value), nodes.ClassDef):
+                # Check TypeVar's
+                if self._assigned_typevar(assign_type.value):
+                    self._check_name("typevar", (assign_type.targets[0]).name, node)
+                # Check classes (TypeVar's are classes so they need to be excluded first)
+                elif isinstance(utils.safe_infer(assign_type.value), nodes.ClassDef):
                     self._check_name("class", node.name, node)
-                # Don't emit if the name redefines an import
-                # in an ImportError except handler.
+                # Don't emit if the name redefines an import in an ImportError except handler.
                 elif not _redefines_import(node) and isinstance(
                     utils.safe_infer(assign_type.value), nodes.Const
                 ):
                     self._check_name("const", node.name, node)
+            # Check names defined in AnnAssign nodes
             elif isinstance(
                 assign_type, nodes.AnnAssign
             ) and utils.is_assign_name_annotated_with(node, "Final"):
                 self._check_name("const", node.name, node)
+
+        # Check names defined in function scopes
         elif isinstance(frame, nodes.FunctionDef):
             # global introduced variable aren't in the function locals
             if node.name in frame and node.name not in frame.argnames():
                 if not _redefines_import(node):
                     self._check_name("variable", node.name, node)
+        # Check names defined in class scopes
         elif isinstance(frame, nodes.ClassDef):
             if not list(frame.local_attr_ancestors(node.name)):
                 for ancestor in frame.ancestors():
@@ -2106,8 +2120,16 @@ class NameChecker(_BasicChecker):
         if match is None and not _should_exempt_from_invalid_name(node):
             self._raise_name_warning(None, node, node_type, name, confidence)
 
-        if match is not None and node_type == "typevar":
-            self._check_typevar_variance(name, node)
+        # Check TypeVar names for variance suffixes
+        if node_type == "typevar":
+            args = self._check_typevar_variance(name, node)
+            if args is not None:
+                self.add_message(
+                    "typevar-name-missing-variance",
+                    node=node,
+                    args=args,
+                    confidence=interfaces.HIGH,
+                )
 
     def _check_assign_to_new_keyword_violation(self, name, node):
         keyword_first_version = self._name_became_keyword_in_version(
@@ -2129,7 +2151,8 @@ class NameChecker(_BasicChecker):
         return None
 
     @staticmethod
-    def _assigned_typevar(node):
+    def _assigned_typevar(node) -> bool:
+        """See if a node is assigning a TypeVar"""
         if isinstance(node, astroid.Call):
             inferred = utils.safe_infer(node.func)
             if (
@@ -2140,45 +2163,32 @@ class NameChecker(_BasicChecker):
                 return True
         return False
 
-    def _check_typevar_variance(self, name, node):
+    def _check_typevar_variance(
+        self, name: str, node: nodes.Name
+    ) -> Optional[Tuple[str, str, str]]:
+        """Check if a TypeVar has a variance, and if so if it is included in its name.
+        Returns the args for the message to be displayed"""
+        _co, _contra = "_co", "_contra"
         if self._typevar_naming_style == "UPPER_CASE":
             _co, _contra = "_CO", "_CONTRA"
-        else:
-            _co, _contra = "_co", "_contra"
 
         keywords = node.assign_type().value.keywords
         if keywords:
             for kw in keywords:
                 if kw.arg == "covariant" and kw.value.value and not name.endswith(_co):
                     suggest_name = "".join((name.rsplit("_", 1)[0], _co))
-                    self.add_message(
-                        "bad-typevar-name",
-                        node=node,
-                        args=(name, "covariant", suggest_name),
-                        confidence=interfaces.HIGH,
-                    )
-                    return
+                    return (name, "covariant", suggest_name)
                 if (
                     kw.arg == "contravariant"
                     and kw.value.value
                     and not name.endswith(_contra)
                 ):
                     suggest_name = "".join((name.rsplit("_", 1)[0], _contra))
-                    self.add_message(
-                        "bad-typevar-name",
-                        node=node,
-                        args=(name, "contravariant", suggest_name),
-                        confidence=interfaces.HIGH,
-                    )
-                    return
+                    return (name, "contravariant", suggest_name)
         elif name.endswith(_co) or name.endswith(_contra):
             suggest_name = name.rsplit("_", 1)[0]
-            self.add_message(
-                "bad-typevar-name",
-                node=node,
-                args=(name, "invariant", suggest_name),
-                confidence=interfaces.HIGH,
-            )
+            return (name, "invariant", suggest_name)
+        return None
 
 
 class DocStringChecker(_BasicChecker):

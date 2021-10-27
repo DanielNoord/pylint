@@ -12,10 +12,10 @@ class Hasher(typing.Protocol):
         ...
 
 
-Generic = typing.TypeVar("Generic")
+T_Generic = typing.TypeVar("T_Generic")
 
 
-class HasherGeneric(typing.Protocol[Generic]):
+class HasherGeneric(typing.Protocol[T_Generic]):
     """A hashing algorithm, e.g. :func:`hashlib.sha256`."""
     def update(self, blob: bytes):
         ...

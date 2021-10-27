@@ -73,7 +73,6 @@ disable=
     attribute-defined-outside-init,
     duplicate-code,
     invalid-name,
-    bad-typevar-name,
     missing-docstring,
     protected-access,
     too-few-public-methods,
@@ -268,6 +267,13 @@ docstring-min-length=-1
 
 # List of decorators that define properties, such as abc.abstractproperty.
 property-classes=abc.abstractproperty
+
+# Naming style used for type variables. Default is PascalCase.
+typevar-naming-style=PascalCase
+
+# Regular expression which can overwrite the naming style set by typevar-naming-style.
+# If left empty, type variables will be checked with the set naming style.
+typevar-rgx=
 
 
 [TYPECHECK]

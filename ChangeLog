@@ -116,7 +116,7 @@ Release date: TBA
   or contravariant ``TypeVar`` does not include  ``_co`` or ``_contra`` respectively.
 
 * ``invalid-name`` check now also checks ``TypeVar`` for a pattern set with the new option
-  ``--typevar-rgx`` option or the chosen naming style.
+  ``--typevar-rgx`` option or the chosen naming style (``--typevar-naming-style``).
 
   Closes #3401
 
