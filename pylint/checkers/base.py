@@ -1988,7 +1988,6 @@ class NameChecker(_BasicChecker):
         self._check_assign_to_new_keyword_violation(node.name, node)
         frame = node.frame()
         assign_type = node.assign_type()
-        inferred_assign_type = utils.safe_infer(assign_type.value)
 
         # Check names defined in comprehensions
         if isinstance(assign_type, nodes.Comprehension):
@@ -1998,6 +1997,8 @@ class NameChecker(_BasicChecker):
         elif isinstance(frame, nodes.Module):
             # Check names defined in Assign nodes
             if isinstance(assign_type, nodes.Assign):
+                inferred_assign_type = utils.safe_infer(assign_type.value)
+
                 # Check TypeVar's assigned alone or in tuple assignment
                 if isinstance(node.parent, nodes.Assign) and self._assigned_typevar(
                     assign_type.value
