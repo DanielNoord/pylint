@@ -91,8 +91,6 @@ Other Changes
 
   This command lists all extensions present in ``pylint.extensions``.
 
-* Add new ``--typevar-naming-style`` and ``--typevar-rgx`` options to configure naming style for type variable.
-
 * Various false positives have been fixed which you can read more about in the Changelog files.
 
 * Multiple types of string formatting are allowed in logging functions.

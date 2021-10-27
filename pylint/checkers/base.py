@@ -2151,7 +2151,7 @@ class NameChecker(_BasicChecker):
         return None
 
     @staticmethod
-    def _assigned_typevar(node) -> bool:
+    def _assigned_typevar(node: Optional[nodes.NodeNG]) -> bool:
         """See if a node is assigning a TypeVar"""
         if isinstance(node, astroid.Call):
             inferred = utils.safe_infer(node.func)
@@ -2164,7 +2164,7 @@ class NameChecker(_BasicChecker):
         return False
 
     def _check_typevar_variance(
-        self, name: str, node: nodes.Name
+        self, name: str, node: nodes.AssignName
     ) -> Optional[Tuple[str, str, str]]:
         """Check if a TypeVar has a variance, and if so if it is included in its name.
         Returns the args for the message to be displayed"""
