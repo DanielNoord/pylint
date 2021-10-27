@@ -1988,6 +1988,7 @@ class NameChecker(_BasicChecker):
         self._check_assign_to_new_keyword_violation(node.name, node)
         frame = node.frame()
         assign_type = node.assign_type()
+        inferred_assign_type = utils.safe_infer(assign_type.value)
 
         # Check names defined in comprehensions
         if isinstance(assign_type, nodes.Comprehension):
@@ -2015,11 +2016,11 @@ class NameChecker(_BasicChecker):
                         node,
                     )
                 # Check classes (TypeVar's are classes so they need to be excluded first)
-                elif isinstance(utils.safe_infer(assign_type.value), nodes.ClassDef):
+                elif isinstance(inferred_assign_type, nodes.ClassDef):
                     self._check_name("class", node.name, node)
                 # Don't emit if the name redefines an import in an ImportError except handler.
                 elif not _redefines_import(node) and isinstance(
-                    utils.safe_infer(assign_type.value), nodes.Const
+                    inferred_assign_type, nodes.Const
                 ):
                     self._check_name("const", node.name, node)
             # Check names defined in AnnAssign nodes
