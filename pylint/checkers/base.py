@@ -2001,7 +2001,7 @@ class NameChecker(_BasicChecker):
                 if isinstance(node.parent, nodes.Assign) and self._assigned_typevar(
                     assign_type.value
                 ):
-                    self._check_name("typevar", (assign_type.targets[0]).name, node)
+                    self._check_name("typevar", assign_type.targets[0].name, node)
                 elif (
                     isinstance(node.parent, nodes.Tuple)
                     and isinstance(assign_type.value, nodes.Tuple)
@@ -2011,9 +2011,7 @@ class NameChecker(_BasicChecker):
                 ):
                     self._check_name(
                         "typevar",
-                        (
-                            assign_type.targets[0].elts[node.parent.elts.index(node)]
-                        ).name,
+                        assign_type.targets[0].elts[node.parent.elts.index(node)].name,
                         node,
                     )
                 # Check classes (TypeVar's are classes so they need to be excluded first)

@@ -4,7 +4,7 @@ from typing import TypeVar
 
 # PascalCase names with prefix
 T_GoodName = TypeVar("T_GoodName")
-T_GoodNameWithoutContra = TypeVar(  # [typevar-name-missing-variance]]
+T_GoodNameWithoutContra = TypeVar(  # [typevar-name-missing-variance]
     "T_GoodNameWithoutContra", contravariant=True
 )
 T_GoodName_co = TypeVar("T_GoodName_co", covariant=True)
