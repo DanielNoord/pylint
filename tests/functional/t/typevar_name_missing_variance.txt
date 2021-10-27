@@ -2,5 +2,9 @@ typevar-name-missing-variance:7:0::"Type variable ""T_co"" is invariant, use ""T
 typevar-name-missing-variance:8:0::"Type variable ""T_contra"" is invariant, use ""T"" instead":HIGH
 typevar-name-missing-variance:16:0::"Type variable ""CT_co"" is contravariant, use ""CT_contra"" instead":HIGH
 typevar-name-missing-variance:17:0::"Type variable ""CT_contra"" is invariant, use ""CT"" instead":HIGH
-typevar-name-missing-variance:22:0::"Type variable ""VT"" is covariant, use ""VT_co"" instead":HIGH
-typevar-name-missing-variance:23:0::"Type variable ""VT_contra"" is covariant, use ""VT_co"" instead":HIGH
+typevar-name-missing-variance:21:0::"Type variable ""VT"" is covariant, use ""VT_co"" instead":HIGH
+typevar-name-missing-variance:22:0::"Type variable ""VT_contra"" is covariant, use ""VT_co"" instead":HIGH
+typevar-name-missing-variance:27:4::"Type variable ""VT"" is covariant, use ""VT_co"" instead":HIGH
+typevar-name-missing-variance:28:4::"Type variable ""VT_contra"" is covariant, use ""VT_co"" instead":HIGH
+typevar-name-missing-variance:30:7::"Type variable ""VT_contra"" is covariant, use ""VT_co"" instead":HIGH
+typevar-name-missing-variance:33:5::"Type variable ""VT_contra"" is covariant, use ""VT_co"" instead":HIGH

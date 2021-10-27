@@ -18,7 +18,18 @@ CT_contra = TypeVar("CT_contra")  # [typevar-name-missing-variance]
 CT_contra = TypeVar("CT_contra", contravariant=True)
 
 # Tests for combinations with covariance
-
 VT = TypeVar("VT", covariant=True)  # [typevar-name-missing-variance]
 VT_contra = TypeVar("VT_contra", covariant=True)  # [typevar-name-missing-variance]
 VT_co = TypeVar("VT_co", covariant=True)
+
+# Tests for combinations with tuple assignment
+(
+    VT,  # [typevar-name-missing-variance]
+    VT_contra,  # [typevar-name-missing-variance]
+) = TypeVar("VT", covariant=True), TypeVar("VT_contra", covariant=True)
+VT_co, VT_contra = TypeVar(  # [typevar-name-missing-variance]
+    "VT_co", covariant=True
+), TypeVar("VT_contra", covariant=True)
+VAR, VT_contra = "a string", TypeVar(  # [typevar-name-missing-variance]
+    "VT_contra", covariant=True
+)

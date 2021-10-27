@@ -2001,9 +2001,25 @@ class NameChecker(_BasicChecker):
         elif isinstance(frame, nodes.Module):
             # Check names defined in Assign nodes
             if isinstance(assign_type, nodes.Assign):
-                # Check TypeVar's
-                if self._assigned_typevar(assign_type.value):
+                # Check TypeVar's assigned alone or in tuple assignment
+                if isinstance(node.parent, nodes.Assign) and self._assigned_typevar(
+                    assign_type.value
+                ):
                     self._check_name("typevar", (assign_type.targets[0]).name, node)
+                elif (
+                    isinstance(node.parent, nodes.Tuple)
+                    and isinstance(assign_type.value, nodes.Tuple)
+                    and self._assigned_typevar(
+                        assign_type.value.elts[node.parent.elts.index(node)]
+                    )
+                ):
+                    self._check_name(
+                        "typevar",
+                        (
+                            assign_type.targets[0].elts[node.parent.elts.index(node)]
+                        ).name,
+                        node,
+                    )
                 # Check classes (TypeVar's are classes so they need to be excluded first)
                 elif isinstance(utils.safe_infer(assign_type.value), nodes.ClassDef):
                     self._check_name("class", node.name, node)
@@ -2172,7 +2188,13 @@ class NameChecker(_BasicChecker):
         if self._typevar_naming_style == "UPPER_CASE":
             _co, _contra = "_CO", "_CONTRA"
 
-        keywords = node.assign_type().value.keywords
+        if isinstance(node.parent, nodes.Assign):
+            keywords = node.assign_type().value.keywords
+        elif isinstance(node.parent, nodes.Tuple):
+            keywords = (
+                node.assign_type().value.elts[node.parent.elts.index(node)].keywords
+            )
+
         if keywords:
             for kw in keywords:
                 if kw.arg == "covariant" and kw.value.value and not name.endswith(_co):

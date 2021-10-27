@@ -25,3 +25,15 @@ T_goodNameWithoutContra = TypeVar(  # [invalid-name, typevar-name-missing-varian
 )
 T_goodName_co = TypeVar("T_goodName_co", covariant=True)  # [invalid-name]
 T_goodName_contra = TypeVar("T_goodName_contra", contravariant=True)  # [invalid-name]
+
+# PascalCase names without prefix in tuple assignment
+(
+    BadName,  # [invalid-name]
+    BadNameWithoutContra,  # [invalid-name, typevar-name-missing-variance]
+) = TypeVar("BadName"), TypeVar("BadNameWithoutContra", contravariant=True)
+BadName_co, BadName_contra = TypeVar(  # [invalid-name, invalid-name]
+    "BadName_co", covariant=True
+), TypeVar("BadName_contra", contravariant=True)
+BadName_co, VAR = TypeVar(  # [invalid-name]
+    "BadName_co", covariant=True
+), "a string"
