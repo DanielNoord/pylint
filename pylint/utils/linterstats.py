@@ -204,7 +204,7 @@ class LinterStats:
                 "method",
                 "module",
                 "variable",
-                "typevar"
+                "typevar",
             ],
             node_name,
         )

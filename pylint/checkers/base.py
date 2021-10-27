@@ -2024,7 +2024,6 @@ class NameChecker(_BasicChecker):
                 else:
                     self._check_name("class_attribute", node.name, node)
 
-
     def _recursive_check_names(self, args):
         """check names in a possibly recursive list <arg>"""
         for arg in args:
