@@ -2001,7 +2001,7 @@ class NameChecker(_BasicChecker):
 
                 # Check TypeVar's assigned alone or in tuple assignment
                 if isinstance(node.parent, nodes.Assign) and self._assigns_typevar(
-                    inferred_assign_type
+                    assign_type.value
                 ):
                     self._check_name("typevar", assign_type.targets[0].name, node)
                 elif (
@@ -2165,7 +2165,6 @@ class NameChecker(_BasicChecker):
     @staticmethod
     def _assigns_typevar(node: Optional[nodes.NodeNG]) -> bool:
         """Check if a node is assigning a TypeVar"""
-        print(node.qname())
         if isinstance(node, astroid.Call):
             inferred = utils.safe_infer(node.func)
             if (
