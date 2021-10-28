@@ -2000,14 +2000,14 @@ class NameChecker(_BasicChecker):
                 inferred_assign_type = utils.safe_infer(assign_type.value)
 
                 # Check TypeVar's assigned alone or in tuple assignment
-                if isinstance(node.parent, nodes.Assign) and self._assigned_typevar(
+                if isinstance(node.parent, nodes.Assign) and self._assigns_typevar(
                     inferred_assign_type
                 ):
                     self._check_name("typevar", assign_type.targets[0].name, node)
                 elif (
                     isinstance(node.parent, nodes.Tuple)
                     and isinstance(assign_type.value, nodes.Tuple)
-                    and self._assigned_typevar(
+                    and self._assigns_typevar(
                         assign_type.value.elts[node.parent.elts.index(node)]
                     )
                 ):
@@ -2163,16 +2163,18 @@ class NameChecker(_BasicChecker):
         return None
 
     @staticmethod
-    def _assigned_typevar(node: Optional[nodes.NodeNG]) -> bool:
-        """See if a node is assigning a TypeVar"""
-        # node can be pre-inferred in which case a TypeVar-node is no longer a nodes.Call
-        # anymore and this inference can be skipped
-        if isinstance(node, nodes.Call):
-            node = utils.safe_infer(node.func)
-
-        return (
-            isinstance(node, nodes.ClassDef) and node.qname() == TYPING_TYPE_VAR_QNAME
-        )
+    def _assigns_typevar(node: Optional[nodes.NodeNG]) -> bool:
+        """Check if a node is assigning a TypeVar"""
+        print(node.qname())
+        if isinstance(node, astroid.Call):
+            inferred = utils.safe_infer(node.func)
+            if (
+                inferred
+                and isinstance(inferred, astroid.ClassDef)
+                and inferred.qname() == TYPING_TYPE_VAR_QNAME
+            ):
+                return True
+        return False
 
     def _check_typevar_variance(
         self, name: str, node: nodes.AssignName
