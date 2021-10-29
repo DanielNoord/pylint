@@ -2167,11 +2167,12 @@ class NameChecker(_BasicChecker):
         """Check if a node is assigning a TypeVar"""
         if isinstance(node, astroid.Call):
             inferred = utils.safe_infer(node.func)
-            return (
+            if (
                 inferred
                 and isinstance(inferred, astroid.ClassDef)
                 and inferred.qname() == TYPING_TYPE_VAR_QNAME
-            )
+            ):
+                return True
         return False
 
     def _check_typevar_variance(
@@ -2189,6 +2190,8 @@ class NameChecker(_BasicChecker):
             keywords = (
                 node.assign_type().value.elts[node.parent.elts.index(node)].keywords
             )
+        else:
+            return None
 
         if keywords:
             for kw in keywords:
