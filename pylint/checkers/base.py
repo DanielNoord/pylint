@@ -2167,12 +2167,11 @@ class NameChecker(_BasicChecker):
         """Check if a node is assigning a TypeVar"""
         if isinstance(node, astroid.Call):
             inferred = utils.safe_infer(node.func)
-            if (
+            return (
                 inferred
                 and isinstance(inferred, astroid.ClassDef)
                 and inferred.qname() == TYPING_TYPE_VAR_QNAME
-            ):
-                return True
+            )
         return False
 
     def _check_typevar_variance(
