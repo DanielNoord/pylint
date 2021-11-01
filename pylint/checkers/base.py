@@ -141,7 +141,7 @@ class SnakeCaseStyle(NamingStyle):
 class CamelCaseStyle(NamingStyle):
     """Regex rules for camelCase naming style."""
 
-    TYPE_VAR_RGX = re.compile(r"[^\W\dA-Z]+_[^\W_]*(_co(ntra)?)?$")
+    TYPE_VAR_RGX = re.compile(r"_*[^\W\dA-Z]+_[^\W_]*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\dA-Z][^\W_]*$")
     CONST_NAME_RGX = re.compile(r"([^\W\dA-Z][^\W_]*|__.*__)$")
@@ -153,7 +153,7 @@ class CamelCaseStyle(NamingStyle):
 class PascalCaseStyle(NamingStyle):
     """Regex rules for PascalCase naming style."""
 
-    TYPE_VAR_RGX = re.compile(r"[^\W\da-z]+?_?([^\W\da-z_][^\WA-Z_]+)*(_co(ntra)?)?$")
+    TYPE_VAR_RGX = re.compile(r"_*[^\W\da-z]*_?([^\W\da-z_][^\WA-Z_]+)*(_co(ntra)?)?$")
     CLASS_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     MOD_NAME_RGX = re.compile(r"[^\W\da-z][^\W_]+$")
     CONST_NAME_RGX = re.compile(r"([^\W\da-z][^\W_]*|__.*__)$")
