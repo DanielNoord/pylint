@@ -15,7 +15,7 @@ from tests.primer.primer_external_packages import (
 class TestPrimer:
     @staticmethod
     @pytest.mark.primer
-    @pytest.mark.parametrize(("package"), PACKAGES_TO_LINT.items())
+    @pytest.mark.parametrize(("package"), PACKAGES_TO_LINT.values())
     def test_primer_external_packages_no_crash(package: PackageToLint):
         """Runs pylint over external packages to check for crashes"""
         clone_primer_packages(package)
