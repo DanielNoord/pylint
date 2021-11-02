@@ -5,19 +5,21 @@ import subprocess
 
 import pytest
 from tests.primer.primer_clone_external import clone_primer_packages
-from tests.primer.primer_external_packages import (
-    PACKAGES_TO_LINT,
-    PRIMER_DIRECTORY,
-    PackageToLint,
-)
+from tests.primer.primer_external_packages import PACKAGES_TO_LINT, PRIMER_DIRECTORY
 
 
 class TestPrimer:
     @staticmethod
     @pytest.mark.primer
     @pytest.mark.parametrize(("package"), PACKAGES_TO_LINT)
-    def test_primer_external_packages_no_crash(package: PackageToLint):
-        """Runs pylint over external packages to check for crashes"""
+    def test_primer_external_packages_no_crash(package: str) -> None:
+        """Runs pylint over external packages to check for crashes and fatal messages
+
+        We only check for crashes (bit-encoded exit code 32) and
+        fatal messages (bit-encoded exit code 1). We assume that these external repositories
+        do not have any fatal errors in their code so that any fatal errors are pylint false
+        positives
+        """
         package_data = PACKAGES_TO_LINT[package]
 
         # Clone the packages repository
@@ -34,6 +36,5 @@ class TestPrimer:
                 check=True,
             )
         except subprocess.CalledProcessError as ex:
-            # We only check for crashes (error code 32)
-            # We suppose that errors in a big lib come from a pylint false positive
-            assert ex.returncode != 32
+            assert ex.returncode != 32  # Crash
+            assert ex.returncode % 2 == 0  # Message of category Fatal has
