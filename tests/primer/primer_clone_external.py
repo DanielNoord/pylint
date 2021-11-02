@@ -11,11 +11,15 @@ from tests.primer.primer_external_packages import PRIMER_DIRECTORY, PackageToLin
 def _lazy_git_clone(data: PackageToLint, target_directory: str) -> None:
     """Clones a repository while checking if it hasn't already been cloned"""
     if os.path.exists(target_directory):
+        # Get SHA1 hash of latest commit on remote branch
         remote_sha1_commit = (
             git.cmd.Git().ls_remote(data.url, data.branch).split("\t")[0]
         )
+        # Get SHA1 hash of latest commit on locally downloaded branch
         local_sha1_commit = git.Repo(target_directory).head.object.hexsha
+
         if remote_sha1_commit != local_sha1_commit:
+            # Remove directory and all its files
             shutil.rmtree(target_directory)
             git.Repo.clone_from(
                 data.url,

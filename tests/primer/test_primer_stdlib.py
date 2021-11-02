@@ -11,11 +11,11 @@ import pytest
 import pylint.lint
 
 
-def is_module(filename):
+def is_module(filename: str) -> bool:
     return filename.endswith(".py")
 
 
-def is_package(filename, location):
+def is_package(filename: str, location: str) -> bool:
     return os.path.exists(os.path.join(location, filename, "__init__.py"))
 
 
@@ -42,11 +42,13 @@ MODULES_NAMES = [m[1] for m in MODULES_TO_CHECK]
 @pytest.mark.parametrize(
     ("test_module_location", "test_module_name"), MODULES_TO_CHECK, ids=MODULES_NAMES
 )
-def test_lib_module_no_crash(test_module_location, test_module_name):
+def test_lib_module_no_crash(test_module_location: str, test_module_name: str) -> None:
+    """Test that pylint does not produces any crashes or fatal errors on stdlib modules"""
     os.chdir(test_module_location)
+
     with _patch_stdout(io.StringIO()):
         try:
             pylint.lint.Run([test_module_name, "--enable=all", "--ignore=test"])
         except SystemExit as ex:
-            assert ex.code != 32
-            return
+            assert ex.code != 32  # Crash
+            assert ex.code % 2 == 0  # Message of category Fatal

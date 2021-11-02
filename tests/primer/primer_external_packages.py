@@ -30,3 +30,4 @@ PACKAGES_TO_LINT = {
         "https://github.com/numpy/numpy.git", "main", None, "/numpy/numpy", "numpy"
     ),
 }
+"""Dictionary of external packages used during the primer test"""
