@@ -11,16 +11,13 @@ from tests.primer.primer_external_packages import PACKAGES_TO_LINT, PRIMER_DIREC
 
 class TestPrimer:
     @staticmethod
-    def setup_class():
-        """Sets up the primer tests by downloading external packages to run pylint over"""
-        clone_primer_packages()
-
-    @staticmethod
     @pytest.mark.primer
     @pytest.mark.parametrize(("package"), PACKAGES_TO_LINT)
     def test_primer_external_packages_no_crash(package: str):
         """Runs pylint over external packages to check for crashes"""
         package_data = PACKAGES_TO_LINT[package]
+
+        clone_primer_packages(package_data)
 
         os.chdir(f"{PRIMER_DIRECTORY}{package_data.clone_directory}")
         try:

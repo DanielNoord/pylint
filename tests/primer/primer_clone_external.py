@@ -5,11 +5,7 @@ import os
 import shutil
 
 import git
-from tests.primer.primer_external_packages import (
-    PACKAGES_TO_LINT,
-    PRIMER_DIRECTORY,
-    PackageToLint,
-)
+from tests.primer.primer_external_packages import PRIMER_DIRECTORY, PackageToLint
 
 
 def _lazy_git_clone(data: PackageToLint, target_directory: str) -> None:
@@ -29,8 +25,7 @@ def _lazy_git_clone(data: PackageToLint, target_directory: str) -> None:
         git.Repo.clone_from(data.url, target_directory, branch=data.branch)
 
 
-def clone_primer_packages() -> None:
-    """Iterates over the list of packages to clone"""
-    for data in PACKAGES_TO_LINT.values():
-        target_directory = f"{PRIMER_DIRECTORY}{data.clone_directory}"
-        _lazy_git_clone(data, target_directory)
+def clone_primer_packages(data: PackageToLint) -> None:
+    """Concatenates the target directory and clones the file"""
+    target_directory = f"{PRIMER_DIRECTORY}{data.clone_directory}"
+    _lazy_git_clone(data, target_directory)
