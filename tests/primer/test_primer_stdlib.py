@@ -38,7 +38,7 @@ MODULES_TO_CHECK = [
 MODULES_NAMES = [m[1] for m in MODULES_TO_CHECK]
 
 
-@pytest.mark.acceptance
+@pytest.mark.primer
 @pytest.mark.parametrize(
     ("test_module_location", "test_module_name"), MODULES_TO_CHECK, ids=MODULES_NAMES
 )
@@ -49,18 +49,4 @@ def test_lib_module_no_crash(test_module_location, test_module_name):
             pylint.lint.Run([test_module_name, "--enable=all", "--ignore=test"])
         except SystemExit as ex:
             assert ex.code != 32
-            return
-
-
-@pytest.mark.acceptance
-@pytest.mark.parametrize(
-    ("test_module_location", "test_module_name"), MODULES_TO_CHECK, ids=MODULES_NAMES
-)
-def test_lib_module_no_error(test_module_location, test_module_name):
-    os.chdir(test_module_location)
-    with _patch_stdout(io.StringIO()):
-        try:
-            pylint.lint.Run([test_module_name, "--errors-only", "--ignore=test"])
-        except SystemExit as ex:
-            assert ex.code == 0
             return
