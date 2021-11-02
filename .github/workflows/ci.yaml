@@ -507,6 +507,5 @@ jobs:
       - name: Run pytest
         run: |
           . venv/bin/activate
-          pip install gitpython
           pip install -e .
           pytest -m primer

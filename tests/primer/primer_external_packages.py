@@ -23,6 +23,9 @@ class PackageToLint(NamedTuple):
 
 
 PACKAGES_TO_LINT = {
+    "black": PackageToLint(
+        "https://github.com/psf/black.git", "main", None, "/psf/black", "src tests"
+    ),
     "numpy": PackageToLint(
         "https://github.com/numpy/numpy.git", "main", None, "/numpy/numpy", "numpy"
     ),
