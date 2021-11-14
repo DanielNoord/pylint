@@ -7,6 +7,7 @@ import os
 import sys
 
 import pytest
+from pytest import CaptureFixture
 
 import pylint.lint
 
@@ -42,13 +43,17 @@ MODULES_NAMES = [m[1] for m in MODULES_TO_CHECK]
 @pytest.mark.parametrize(
     ("test_module_location", "test_module_name"), MODULES_TO_CHECK, ids=MODULES_NAMES
 )
-def test_lib_module_no_crash(test_module_location: str, test_module_name: str) -> None:
+def test_lib_module_no_crash(
+    test_module_location: str, test_module_name: str, capsys: CaptureFixture
+) -> None:
     """Test that pylint does not produces any crashes or fatal errors on stdlib modules"""
     os.chdir(test_module_location)
-
     with _patch_stdout(io.StringIO()):
         try:
             pylint.lint.Run([test_module_name, "--enable=all", "--ignore=test"])
         except SystemExit as ex:
+            out, err = capsys.readouterr()
+            assert not err, err
+            assert not out
             assert ex.code != 32  # Crash
             assert ex.code % 2 == 0  # Message of category Fatal
