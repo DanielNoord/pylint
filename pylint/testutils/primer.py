@@ -1,10 +1,11 @@
 import os
 import shutil
+from pathlib import Path
 from typing import List, NamedTuple, Optional
 
 import git
 
-PRIMER_DIRECTORY = ".pylint_primer_tests"
+PRIMER_DIRECTORY_PATH: Path = Path(".pylint_primer_tests")
 
 
 class PackageToLint(NamedTuple):
@@ -19,8 +20,13 @@ class PackageToLint(NamedTuple):
     commit: Optional[str]
     """Commit hash to pin the repository on"""
 
-    clone_directory: str
-    """Directory to clone repository in to"""
+    @property
+    def clone_directory(self) -> str:
+        """Directory to clone repository into"""
+        return str(
+            PRIMER_DIRECTORY_PATH
+            / "/".join(self.url.split("/")[-2:]).replace(".git", "")
+        )
 
     directories: str
     """Directories within the repository to run pylint over"""
@@ -30,6 +36,13 @@ class PackageToLint(NamedTuple):
 
     pylintrc: str = "./pylintrc"
     """Path to the pylintrc if it exists"""
+
+    @property
+    def paths_to_lint(self) -> List[str]:
+        """The paths we need to lint"""
+        return [
+            f"{self.clone_directory}/{path}" for path in self.directories.split(" ")
+        ]
 
     @property
     def pylint_args(self):
@@ -53,5 +66,4 @@ class PackageToLint(NamedTuple):
 
     def clone(self) -> None:
         """Concatenates the target directory and clones the file"""
-        target_directory = f"{PRIMER_DIRECTORY}{self.clone_directory}"
-        self._lazy_git_clone(target_directory)
+        self._lazy_git_clone(self.clone_directory)
