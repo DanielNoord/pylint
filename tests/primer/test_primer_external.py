@@ -60,5 +60,6 @@ class TestPrimer:
                 check=True,
             )
         except subprocess.CalledProcessError as ex:
-            assert ex.returncode != 32  # Crash
-            assert ex.returncode % 2 == 0  # Message of category Fatal
+            msg = f"Encountered {{}} during primer test for {package}"
+            assert ex.returncode != 32, msg.format("a crash")
+            assert ex.returncode % 2 == 0, msg.format("a message of category 'fatal'")
