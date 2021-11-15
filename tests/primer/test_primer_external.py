@@ -22,6 +22,13 @@ PACKAGES_TO_LINT = {
         "/home-assistant/core",
         "homeassistant",
     ),
+    "graph-explorer": PackageToLint(
+        "https://github.com/vimeo/graph-explorer",
+        "master",
+        None,
+        "/vimeo/graph-explorer",
+        "graph_explorer",
+    ),
 }
 """Dictionary of external packages used during the primer test"""
 
