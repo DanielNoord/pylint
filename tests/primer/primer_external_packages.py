@@ -27,7 +27,11 @@ PACKAGES_TO_LINT = {
         "https://github.com/psf/black.git", "main", None, "/psf/black", "src tests"
     ),
     "home-assistant": PackageToLint(
-        "https://github.com/home-assistant/core.git", "dev", None, "/home-assistant/core", "homeassistant"
+        "https://github.com/home-assistant/core.git",
+        "dev",
+        None,
+        "/home-assistant/core",
+        "homeassistant",
     ),
 }
 """Dictionary of external packages used during the primer test"""
