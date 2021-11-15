@@ -25,7 +25,7 @@ PACKAGES_TO_LINT = {
         url="https://github.com/vimeo/graph-explorer.git",
         branch="master",
         directories="graph_explorer",
-        pylintrc=".pylintrc",
+        pylintrc_relpath=".pylintrc",
     ),
     "pygame": PackageToLint(
         url="https://github.com/pygame/pygame.git",

@@ -17,8 +17,23 @@ class PackageToLint(NamedTuple):
     branch: str
     """Branch of the repository to clone"""
 
+    directories: str
+    """Directories within the repository to run pylint over"""
+
     commit: Optional[str] = None
     """Commit hash to pin the repository on"""
+
+    pylint_additional_args: List[str] = []
+    """Arguments to give to pylint"""
+
+    pylintrc_relpath: Optional[str] = None
+    """Path to the pylintrc if it exists"""
+
+    @property
+    def pylintrc(self):
+        if self.pylintrc_relpath is None:
+            return None
+        return f"{self.clone_directory}/{self.pylintrc_relpath}"
 
     @property
     def clone_directory(self) -> str:
@@ -27,15 +42,6 @@ class PackageToLint(NamedTuple):
             PRIMER_DIRECTORY_PATH
             / "/".join(self.url.split("/")[-2:]).replace(".git", "")
         )
-
-    directories: str
-    """Directories within the repository to run pylint over"""
-
-    pylint_additional_args: List[str] = []
-    """Arguments to give to pylint"""
-
-    pylintrc: str = "./pylintrc"
-    """Path to the pylintrc if it exists"""
 
     @property
     def paths_to_lint(self) -> List[str]:
@@ -46,7 +52,10 @@ class PackageToLint(NamedTuple):
 
     @property
     def pylint_args(self):
-        return [f"--rcfile={self.pylintrc}"] + self.pylint_additional_args
+        rcfile = []
+        if self.pylintrc is not None:
+            rcfile = [f"--rcfile={self.pylintrc}"]
+        return rcfile + self.pylint_additional_args
 
     def _lazy_git_clone(self, target_directory: str) -> None:
         """Clones a repository while checking if it hasn't already been cloned"""
