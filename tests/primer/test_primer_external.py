@@ -14,26 +14,22 @@ PACKAGES_TO_LINT = {
     "black": PackageToLint(
         url="https://github.com/psf/black.git",
         branch="main",
-        commit=None,
         directories="src tests",
     ),
     "home-assistant": PackageToLint(
         url="https://github.com/home-assistant/core.git",
         branch="dev",
-        commit=None,
         directories="homeassistant",
     ),
     "graph-explorer": PackageToLint(
         url="https://github.com/vimeo/graph-explorer.git",
         branch="master",
-        commit=None,
         directories="graph_explorer",
         pylintrc=".pylintrc",
     ),
     "pygame": PackageToLint(
         url="https://github.com/pygame/pygame.git",
         branch="main",
-        commit=None,
         directories="src_py",
     ),
 }

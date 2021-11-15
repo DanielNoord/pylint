@@ -17,7 +17,7 @@ class PackageToLint(NamedTuple):
     branch: str
     """Branch of the repository to clone"""
 
-    commit: Optional[str]
+    commit: Optional[str] = None
     """Commit hash to pin the repository on"""
 
     @property
