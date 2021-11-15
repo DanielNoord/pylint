@@ -1,33 +1,41 @@
 # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 # For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
-
 import subprocess
+from pathlib import Path
 
 import pytest
 
-from pylint.testutils.primer import (
-    PRIMER_DIRECTORY,
-    PackageToLint,
-    clone_primer_packages,
-)
+from pylint.testutils.primer import PackageToLint, clone_primer_packages
 
+PRIMER_DIRECTORY = Path(".pylint_primer_tests/").resolve()
 PACKAGES_TO_LINT = {
     "black": PackageToLint(
-        "https://github.com/psf/black.git", "main", None, "/psf/black", "src tests"
+        url="https://github.com/psf/black.git",
+        branch="main",
+        commit=None,
+        clone_directory="psf/black",
+        directories="src tests",
     ),
     "home-assistant": PackageToLint(
-        "https://github.com/home-assistant/core.git",
-        "dev",
-        None,
-        "/home-assistant/core",
-        "homeassistant",
+        url="https://github.com/home-assistant/core.git",
+        branch="dev",
+        commit=None,
+        clone_directory="home-assistant/core",
+        directories="homeassistant",
     ),
     "graph-explorer": PackageToLint(
-        "https://github.com/vimeo/graph-explorer",
-        "master",
-        None,
-        "/vimeo/graph-explorer",
-        "graph_explorer",
+        url="https://github.com/vimeo/graph-explorer",
+        branch="master",
+        commit=None,
+        clone_directory="vimeo/graph-explorer",
+        directories="graph_explorer",
+    ),
+    "pygame": PackageToLint(
+        url="https://github.com/pygame/pygame",
+        branch="main",
+        commit=None,
+        clone_directory="pygame/pygame",
+        directories="src_py",
     ),
 }
 """Dictionary of external packages used during the primer test"""
