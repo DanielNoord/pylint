@@ -26,7 +26,7 @@ class PackageToLint(NamedTuple):
     """Arguments to give to pylint"""
 
     pylintrc_relpath: Optional[str] = None
-    """Path to the pylintrc if it exists"""
+    """Path relative to project's main directory to the pylintrc if it exists"""
 
     @property
     def pylintrc(self):
@@ -52,7 +52,7 @@ class PackageToLint(NamedTuple):
     def pylint_args(self):
         options = ["--enable-all-extensions"]  # We want to test all the code we can
         if self.pylintrc is not None:
-            options += [f"--options={self.pylintrc}"]
+            options += [f"--rcfile={self.pylintrc}"]
         return options + self.pylint_additional_args
 
     def lazy_clone(self) -> None:
