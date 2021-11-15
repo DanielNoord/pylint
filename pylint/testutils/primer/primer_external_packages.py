@@ -20,18 +20,3 @@ class PackageToLint(NamedTuple):
 
     directories: str
     """Directories within the repostiory to run pylint over"""
-
-
-PACKAGES_TO_LINT = {
-    "black": PackageToLint(
-        "https://github.com/psf/black.git", "main", None, "/psf/black", "src tests"
-    ),
-    "home-assistant": PackageToLint(
-        "https://github.com/home-assistant/core.git",
-        "dev",
-        None,
-        "/home-assistant/core",
-        "homeassistant",
-    ),
-}
-"""Dictionary of external packages used during the primer test"""

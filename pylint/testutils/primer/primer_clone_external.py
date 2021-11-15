@@ -5,7 +5,11 @@ import os
 import shutil
 
 import git
-from tests.primer.primer_external_packages import PRIMER_DIRECTORY, PackageToLint
+
+from pylint.testutils.primer.primer_external_packages import (
+    PRIMER_DIRECTORY,
+    PackageToLint,
+)
 
 
 def _lazy_git_clone(data: PackageToLint, target_directory: str) -> None:

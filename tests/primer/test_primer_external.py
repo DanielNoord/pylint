@@ -4,12 +4,26 @@
 import subprocess
 
 import pytest
-from tests.primer.primer_clone_external import clone_primer_packages
-from tests.primer.primer_external_packages import (
-    PACKAGES_TO_LINT,
+
+from pylint.testutils.primer import (
     PRIMER_DIRECTORY,
     PackageToLint,
+    clone_primer_packages,
 )
+
+PACKAGES_TO_LINT = {
+    "black": PackageToLint(
+        "https://github.com/psf/black.git", "main", None, "/psf/black", "src tests"
+    ),
+    "home-assistant": PackageToLint(
+        "https://github.com/home-assistant/core.git",
+        "dev",
+        None,
+        "/home-assistant/core",
+        "homeassistant",
+    ),
+}
+"""Dictionary of external packages used during the primer test"""
 
 
 class TestPrimer:
@@ -28,7 +42,6 @@ class TestPrimer:
         """
         # Clone the packages repository
         clone_primer_packages(package)
-
         try:
             subprocess.run(
                 ["pylint"]
