@@ -50,10 +50,10 @@ class PackageToLint(NamedTuple):
 
     @property
     def pylint_args(self):
-        rcfile = []
+        options = ["--enable-all-extensions"]  # We want to test all the code we can
         if self.pylintrc is not None:
-            rcfile = [f"--rcfile={self.pylintrc}"]
-        return rcfile + self.pylint_additional_args
+            options += [f"--options={self.pylintrc}"]
+        return options + self.pylint_additional_args
 
     def lazy_clone(self) -> None:
         """Concatenates the target directory and clones the file"""
