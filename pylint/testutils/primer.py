@@ -58,14 +58,13 @@ class PackageToLint(NamedTuple):
     def lazy_clone(self) -> None:
         """Concatenates the target directory and clones the file"""
         logging.info("Lazy cloning %s", self.url)
-        options = {
-            "url": self.url,
-            "to_path": self.clone_directory,
-            "branch": self.branch,
-            "filter": ["tree:0", "blob:none"],
-            "sparse": True,
-        }
         if not self.clone_directory.exists():
+            options = {
+                "url": self.url,
+                "to_path": self.clone_directory,
+                "branch": self.branch,
+                "depth": 1,
+            }
             logging.info("Directory does not exists, cloning: %s", options)
             git.Repo.clone_from(**options)
             return
