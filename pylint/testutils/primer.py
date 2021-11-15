@@ -79,6 +79,8 @@ class PackageToLint(NamedTuple):
                 remote_sha1_commit,
                 local_sha1_commit,
             )
-            git.Repo.clone_from(**options)
+            repo = git.Repo(self.clone_directory)
+            origin = repo.remotes.origin
+            origin.pull()
         else:
             logging.info("Already up to date.")
