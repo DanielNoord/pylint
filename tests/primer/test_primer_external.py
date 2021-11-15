@@ -29,6 +29,7 @@ PACKAGES_TO_LINT = {
         commit=None,
         clone_directory="vimeo/graph-explorer",
         directories="graph_explorer",
+        pylintrc=".pylintrc",
     ),
     "pygame": PackageToLint(
         url="https://github.com/pygame/pygame",
@@ -61,7 +62,7 @@ class TestPrimer:
                     f"{PRIMER_DIRECTORY}{package.clone_directory}/{i}"
                     for i in package.directories.split(" ")
                 ]
-                + ["--rcfile=./pylintrc"],
+                + package.pylint_args,
                 check=True,
             )
         except subprocess.CalledProcessError as ex:

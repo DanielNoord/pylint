@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 import git
 
@@ -24,6 +24,16 @@ class PackageToLint(NamedTuple):
 
     directories: str
     """Directories within the repository to run pylint over"""
+
+    pylint_additional_args: List[str] = []
+    """Arguments to give to pylint"""
+
+    pylintrc: str = "./pylintrc"
+    """Path to the pylintrc if it exists"""
+
+    @property
+    def pylint_args(self):
+        return [f"--rcfile={self.pylintrc}"] + self.pylint_additional_args
 
     def _lazy_git_clone(self, target_directory: str) -> None:
         """Clones a repository while checking if it hasn't already been cloned"""
