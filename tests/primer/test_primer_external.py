@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from pylint.testutils.primer import PackageToLint, clone_primer_packages
+from pylint.testutils.primer import PackageToLint
 
 PRIMER_DIRECTORY = Path(".pylint_primer_tests/").resolve()
 PACKAGES_TO_LINT = {
@@ -53,8 +53,7 @@ class TestPrimer:
         do not have any fatal errors in their code so that any fatal errors are pylint false
         positives
         """
-        # Clone the packages repository
-        clone_primer_packages(package)
+        package.clone()
         try:
             subprocess.run(
                 ["pylint"]
