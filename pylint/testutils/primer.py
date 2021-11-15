@@ -50,8 +50,10 @@ class PackageToLint(NamedTuple):
 
     @property
     def pylint_args(self):
-        options = ["--enable-all-extensions"]  # We want to test all the code we can
+        # We want to test all the code we can
+        options = ["--enable-all-extensions", "--enable=all"]
         if self.pylintrc is not None:
+            # There is an error if rcfile is given but does not exists
             options += [f"--rcfile={self.pylintrc}"]
         return options + self.pylint_additional_args
 
