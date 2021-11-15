@@ -1,5 +1,4 @@
-import os
-import shutil
+import logging
 from pathlib import Path
 from typing import List, NamedTuple, Optional
 
@@ -36,11 +35,10 @@ class PackageToLint(NamedTuple):
         return f"{self.clone_directory}/{self.pylintrc_relpath}"
 
     @property
-    def clone_directory(self) -> str:
+    def clone_directory(self) -> Path:
         """Directory to clone repository into"""
-        return str(
-            PRIMER_DIRECTORY_PATH
-            / "/".join(self.url.split("/")[-2:]).replace(".git", "")
+        return PRIMER_DIRECTORY_PATH / "/".join(self.url.split("/")[-2:]).replace(
+            ".git", ""
         )
 
     @property
@@ -57,22 +55,30 @@ class PackageToLint(NamedTuple):
             rcfile = [f"--rcfile={self.pylintrc}"]
         return rcfile + self.pylint_additional_args
 
-    def _lazy_git_clone(self, target_directory: str) -> None:
-        """Clones a repository while checking if it hasn't already been cloned"""
-        if os.path.exists(target_directory):
-            # Get SHA1 hash of latest commit on remote branch
-            remote_sha1_commit = (
-                git.cmd.Git().ls_remote(self.url, self.branch).split("\t")[0]
-            )
-            # Get SHA1 hash of latest commit on locally downloaded branch
-            local_sha1_commit = git.Repo(target_directory).head.object.hexsha
-            if remote_sha1_commit != local_sha1_commit:
-                # Remove directory and all its files
-                shutil.rmtree(target_directory)
-                git.Repo.clone_from(self.url, target_directory)
-        else:
-            git.Repo.clone_from(self.url, target_directory, branch=self.branch)
-
-    def clone(self) -> None:
+    def lazy_clone(self) -> None:
         """Concatenates the target directory and clones the file"""
-        self._lazy_git_clone(self.clone_directory)
+        logging.info("Lazy cloning %s", self.url)
+        options = {
+            "url": self.url,
+            "to_path": self.clone_directory,
+            "branch": self.branch,
+            "filter": ["tree:0", "blob:none"],
+            "sparse": True,
+        }
+        if not self.clone_directory.exists():
+            logging.info("Directory does not exists, cloning: %s", options)
+            git.Repo.clone_from(**options)
+            return
+        remote_sha1_commit = (
+            git.cmd.Git().ls_remote(self.url, self.branch).split("\t")[0]
+        )
+        local_sha1_commit = git.Repo(self.clone_directory).head.object.hexsha
+        if remote_sha1_commit != local_sha1_commit:
+            logging.info(
+                "Remote sha is %s while local sha is %s : pulling",
+                remote_sha1_commit,
+                local_sha1_commit,
+            )
+            git.Repo.clone_from(**options)
+        else:
+            logging.info("Already up to date.")

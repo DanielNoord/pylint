@@ -52,13 +52,14 @@ class TestPrimer:
         positives
         """
         caplog.set_level(logging.INFO)
-        package.clone()
+        package.lazy_clone()
         try:
             command = ["pylint"] + package.paths_to_lint + package.pylint_args
             logging.info(
                 "Launching primer '%s':\n%s", package.clone_directory, " ".join(command)
             )
             subprocess.run(command, check=True)
+
         except subprocess.CalledProcessError as ex:
             msg = f"Encountered {{}} during primer test for {package}"
             assert ex.returncode != 32, msg.format("a crash")
