@@ -19,4 +19,4 @@ class PackageToLint(NamedTuple):
     """Directory to clone repository in to"""
 
     directories: str
-    """Directories within the repostiory to run pylint over"""
+    """Directories within the repository to run pylint over"""
