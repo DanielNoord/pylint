@@ -36,9 +36,7 @@ PACKAGES_TO_LINT = {
 class TestPrimer:
     @staticmethod
     @pytest.mark.primer
-    @pytest.mark.parametrize(
-        ("package"), PACKAGES_TO_LINT.values(), ids=PACKAGES_TO_LINT
-    )
+    @pytest.mark.parametrize("package", PACKAGES_TO_LINT.values(), ids=PACKAGES_TO_LINT)
     def test_primer_external_packages_no_crash(package: PackageToLint) -> None:
         """Runs pylint over external packages to check for crashes and fatal messages
 
