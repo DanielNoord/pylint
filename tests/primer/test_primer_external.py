@@ -11,6 +11,36 @@ from pylint.testutils.primer import PackageToLint
 
 PRIMER_DIRECTORY = Path(".pylint_primer_tests/").resolve()
 PACKAGES_TO_LINT = {
+    "scikit-learn": PackageToLint(
+        url="https://github.com/scikit-learn/scikit-learn.git",
+        branch="main",
+        directories="sklearn",
+    ),
+    "flask": PackageToLint(
+        url="https://github.com/pallets/flask.git",
+        branch="main",
+        directories="src",
+    ),
+    "keras": PackageToLint(
+        url="https://github.com/keras-team/keras.git",
+        branch="master",
+        directories="keras",
+    ),
+    "sentry": PackageToLint(
+        url="https://github.com/getsentry/sentry.git",
+        branch="master",
+        directories="src tests",
+    ),
+    "django": PackageToLint(
+        url="https://github.com/django/django.git",
+        branch="main",
+        directories="django tests",
+    ),
+    "pandas": PackageToLint(
+        url="https://github.com/pandas-dev/pandas.git",
+        branch="master",
+        directories="pandas",
+    ),
     "black": PackageToLint(
         url="https://github.com/psf/black.git",
         branch="main",
