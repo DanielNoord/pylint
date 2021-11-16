@@ -508,4 +508,4 @@ jobs:
         run: |
           . venv/bin/activate
           pip install -e .
-          pytest -m primer
+          pytest -m primer -n auto
