@@ -50,7 +50,14 @@ def test_lib_module_no_crash(
     os.chdir(test_module_location)
     with _patch_stdout(io.StringIO()):
         try:
-            pylint.lint.Run([test_module_name, "--enable=all", "--ignore=test"])
+            pylint.lint.Run(
+                [
+                    test_module_name,
+                    "--enable=all",
+                    "--enable-all-extensions",
+                    "--ignore=test",
+                ]
+            )
         except SystemExit as ex:
             out, err = capsys.readouterr()
             assert not err, err

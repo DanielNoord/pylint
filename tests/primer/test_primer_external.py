@@ -54,7 +54,12 @@ class TestPrimer:
         caplog.set_level(logging.INFO)
         package.lazy_clone()
         try:
-            command = ["pylint"] + package.paths_to_lint + package.pylint_args
+            # We want to test all the code we can
+            command = (
+                ["pylint", "--enable-all-extensions", "--enable=all"]
+                + package.paths_to_lint
+                + package.pylint_args
+            )
             logging.info(
                 "Launching primer '%s':\n%s", package.clone_directory, " ".join(command)
             )
