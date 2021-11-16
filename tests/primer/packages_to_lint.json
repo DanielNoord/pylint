@@ -7,7 +7,7 @@
   "flask": {
     "url": "https://github.com/pallets/flask.git",
     "branch": "main",
-    "directories": "src"
+    "directories": "src/flask"
   },
   "keras": {
     "url": "https://github.com/keras-team/keras.git",
