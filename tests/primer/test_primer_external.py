@@ -86,7 +86,12 @@ class TestPrimer:
         try:
             # We want to test all the code we can
             command = (
-                ["pylint", "--enable-all-extensions", "--enable=all"]
+                [
+                    "pylint",
+                    "--enable-all-extensions",
+                    "--enable=all",
+                    "--disable=duplicate-code",
+                ]
                 + package.paths_to_lint
                 + package.pylint_args
             )
