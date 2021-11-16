@@ -1,8 +1,10 @@
 # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 # For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
+import json
 import logging
 import subprocess
 from pathlib import Path
+from typing import Dict, Union
 
 import pytest
 from pytest import LogCaptureFixture
@@ -10,59 +12,20 @@ from pytest import LogCaptureFixture
 from pylint.testutils.primer import PackageToLint
 
 PRIMER_DIRECTORY = Path(".pylint_primer_tests/").resolve()
-PACKAGES_TO_LINT = {
-    "scikit-learn": PackageToLint(
-        url="https://github.com/scikit-learn/scikit-learn.git",
-        branch="main",
-        directories="sklearn",
-    ),
-    "flask": PackageToLint(
-        url="https://github.com/pallets/flask.git",
-        branch="main",
-        directories="src",
-    ),
-    "keras": PackageToLint(
-        url="https://github.com/keras-team/keras.git",
-        branch="master",
-        directories="keras",
-    ),
-    "sentry": PackageToLint(
-        url="https://github.com/getsentry/sentry.git",
-        branch="master",
-        directories="src tests",
-    ),
-    "django": PackageToLint(
-        url="https://github.com/django/django.git",
-        branch="main",
-        directories="django tests",
-    ),
-    "pandas": PackageToLint(
-        url="https://github.com/pandas-dev/pandas.git",
-        branch="master",
-        directories="pandas",
-    ),
-    "black": PackageToLint(
-        url="https://github.com/psf/black.git",
-        branch="main",
-        directories="src tests",
-    ),
-    "home-assistant": PackageToLint(
-        url="https://github.com/home-assistant/core.git",
-        branch="dev",
-        directories="homeassistant",
-    ),
-    "graph-explorer": PackageToLint(
-        url="https://github.com/vimeo/graph-explorer.git",
-        branch="master",
-        directories="graph_explorer",
-        pylintrc_relpath=".pylintrc",
-    ),
-    "pygame": PackageToLint(
-        url="https://github.com/pygame/pygame.git",
-        branch="main",
-        directories="src_py",
-    ),
-}
+
+
+def get_packages_to_lint_from_json(
+    json_path: Union[Path, str]
+) -> Dict[str, PackageToLint]:
+    result = {}
+    with open(json_path, encoding="utf8") as f:
+        for name, package_data in json.load(f).items():
+            result[name] = PackageToLint(**package_data)
+    return result
+
+
+PACKAGE_TO_LINT_JSON = Path(__file__).parent / "packages_to_lint.json"
+PACKAGES_TO_LINT = get_packages_to_lint_from_json(PACKAGE_TO_LINT_JSON)
 """Dictionary of external packages used during the primer test"""
 
 

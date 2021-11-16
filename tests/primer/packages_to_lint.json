@@ -1,0 +1,53 @@
+{
+  "scikit-learn": {
+    "url": "https://github.com/scikit-learn/scikit-learn.git",
+    "branch": "main",
+    "directories": "sklearn"
+  },
+  "flask": {
+    "url": "https://github.com/pallets/flask.git",
+    "branch": "main",
+    "directories": "src"
+  },
+  "keras": {
+    "url": "https://github.com/keras-team/keras.git",
+    "branch": "master",
+    "directories": "keras"
+  },
+  "sentry": {
+    "url": "https://github.com/getsentry/sentry.git",
+    "branch": "master",
+    "directories": "src tests"
+  },
+  "django": {
+    "url": "https://github.com/django/django.git",
+    "branch": "main",
+    "directories": "django tests"
+  },
+  "pandas": {
+    "url": "https://github.com/pandas-dev/pandas.git",
+    "branch": "master",
+    "directories": "pandas"
+  },
+  "black": {
+    "url": "https://github.com/psf/black.git",
+    "branch": "main",
+    "directories": "src tests"
+  },
+  "home-assistant": {
+    "url": "https://github.com/home-assistant/core.git",
+    "branch": "dev",
+    "directories": "homeassistant"
+  },
+  "graph-explorer": {
+    "url": "https://github.com/vimeo/graph-explorer.git",
+    "branch": "master",
+    "directories": "graph_explorer",
+    "pylintrc_relpath": ".pylintrc"
+  },
+  "pygame": {
+    "url": "https://github.com/pygame/pygame.git",
+    "branch": "main",
+    "directories": "src_py"
+  }
+}
