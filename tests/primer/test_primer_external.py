@@ -48,13 +48,15 @@ class TestPrimer:
         package.lazy_clone()
         try:
             # We want to test all the code we can
+            enables = ["--enable-all-extensions", "--enable=all"]
+            # Duplicate code takes too long
+            # invalid-name,missing-docstring spam too much and takes too long
+            # All of those are relatively safe
+            disables = ["--disable=duplicate-code,invalid-name,missing-docstring"]
             command = (
-                [
-                    "pylint",
-                    "--enable-all-extensions",
-                    "--enable=all",
-                    "--disable=duplicate-code",
-                ]
+                ["pylint"]
+                + enables
+                + disables
                 + package.paths_to_lint
                 + package.pylint_args
             )
@@ -62,7 +64,6 @@ class TestPrimer:
                 "Launching primer '%s':\n%s", package.clone_directory, " ".join(command)
             )
             subprocess.run(command, check=True)
-
         except subprocess.CalledProcessError as ex:
             msg = f"Encountered {{}} during primer test for {package}"
             assert ex.returncode != 32, msg.format("a crash")
