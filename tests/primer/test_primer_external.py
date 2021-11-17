@@ -52,7 +52,7 @@ class TestPrimer:
             # Duplicate code takes too long
             # invalid-name,missing-docstring spam too much and takes too long
             # All of those are relatively safe
-            disables = ["--disable=duplicate-code,invalid-name,missing-docstring"]
+            disables = ["--disable=duplicate-code"]
             command = (
                 ["pylint"]
                 + enables
