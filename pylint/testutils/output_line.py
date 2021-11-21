@@ -2,6 +2,7 @@
 # For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
 
 import collections
+import warnings
 from typing import Any, NamedTuple, Optional, Sequence, Tuple, Union
 
 from astroid import nodes
@@ -106,6 +107,11 @@ class OutputLine(NamedTuple):
             if isinstance(row, Sequence):
                 column = cls._get_column(row[2])
                 if len(row) == 5:
+                    warnings.warn(
+                        "In pylint 3.0 tests output should always include the expected confidence"
+                        "level. An OutputLine should thus have a length of 6.",
+                        DeprecationWarning,
+                    )
                     return cls(row[0], int(row[1]), column, row[3], row[4], HIGH.name)
                 if len(row) == 6:
                     return cls(row[0], int(row[1]), column, row[3], row[4], row[5])
