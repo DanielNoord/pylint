@@ -49,8 +49,9 @@
 import collections
 import copy
 import os
+import site
 import sys
-from distutils import sysconfig
+import sysconfig
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import astroid
@@ -448,13 +449,12 @@ class ImportsChecker(DeprecatedMixin, BaseChecker):
             return os.path.normcase(os.path.abspath(path))
 
         paths = set()
-        real_prefix = getattr(sys, "real_prefix", None)
-        for prefix in filter(None, (real_prefix, sys.prefix)):
-            path = sysconfig.get_python_lib(prefix=prefix)
+        for path in site.getsitepackages():
             path = _normalized_path(path)
             paths.add(path)
 
         # Handle Debian's derivatives /usr/local.
+        real_prefix = getattr(sys, "real_prefix", None)
         if os.path.isfile("/etc/debian_version"):
             for prefix in filter(None, (real_prefix, sys.prefix)):
                 libpython = os.path.join(
