@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "requirements*"
+      - ".github/workflows/*"
+
+env:
+  CACHE_VERSION: 3
+  DEFAULT_PYTHON: 3.8
+  PRE_COMMIT_CACHE: ~/.cache/pre-commit
+
+jobs:
+  call-create-standard-cache:
+    name: Create caches
+    uses: PyCQA/pylint/.github/workflows/standard-cache.yaml@main

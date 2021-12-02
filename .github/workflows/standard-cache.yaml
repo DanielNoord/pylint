@@ -1,13 +1,7 @@
-name: CI
+name: Standard cache creation
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    paths:
-      - "requirements*"
-      - ".github/workflows/*"
+  workflow_call:
 
 env:
   CACHE_VERSION: 3

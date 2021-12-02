@@ -13,9 +13,26 @@ env:
   PRE_COMMIT_CACHE: ~/.cache/pre-commit
 
 jobs:
+  pre-check-cache:
+    name: Check if caches have been created
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for cache for Linux ${{ env.DEFAULT_PYTHON }}
+        id: cache-venv
+        uses: actions/cache@v2.1.7
+        with:
+          path: venv
+          key:
+            ${{ runner.os }}-${{ env.DEFAULT_PYTHON }}-${{
+            needs.prepare-base.outputs.python-key }}
+      - name: Make caches if no cache is found
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        uses: PyCQA/pylint/.github/workflows/standard-cache.yaml@main
+
   formatting:
     name: Run pre-commit checks
     runs-on: ubuntu-latest
+    needs: pre-check-cache
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v2.4.0
@@ -57,6 +74,7 @@ jobs:
   spelling:
     name: Run spelling checks
     runs-on: ubuntu-latest
+    needs: pre-check-cache
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v2.4.0
@@ -86,6 +104,7 @@ jobs:
   pytest-linux:
     name: Run tests Python ${{ matrix.python-version }} (Linux)
     runs-on: ubuntu-latest
+    needs: pre-check-cache
     strategy:
       fail-fast: false
       matrix:
@@ -124,6 +143,7 @@ jobs:
   coverage:
     name: Process test coverage
     runs-on: ubuntu-latest
+    needs: pre-check-cache
     strategy:
       matrix:
         python-version: [3.8]
@@ -167,6 +187,7 @@ jobs:
   benchmark-linux:
     name: Run benchmark tests Python ${{ matrix.python-version }} (Linux)
     runs-on: ubuntu-latest
+    needs: pre-check-cache
     strategy:
       fail-fast: false
       matrix:
@@ -217,6 +238,7 @@ jobs:
   pytest-windows:
     name: Run tests Python ${{ matrix.python-version }} (Windows)
     runs-on: windows-latest
+    needs: pre-check-cache
     strategy:
       fail-fast: false
       matrix:
@@ -254,6 +276,7 @@ jobs:
   pytest-pypy:
     name: Run tests Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    needs: pre-check-cache
     strategy:
       fail-fast: false
       matrix:
