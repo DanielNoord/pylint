@@ -1385,6 +1385,9 @@ class VariablesChecker(BaseChecker):
                                 node=node,
                             )
                     else:
+                        print("PLEASE SEE ME")
+                        print(node)
+                        print(node.root())
                         self.add_message(
                             "undefined-variable", args=node.name, node=node
                         )

@@ -128,7 +128,7 @@ jobs:
         run: |
           . venv/bin/activate
           pip install -e .
-          pytest -m primer_external_batch_one --primer-external -n auto
+          pytest -m primer_external_batch_one --primer-external -n auto -s
 
   pytest-primer-external-batch-two:
     name:
@@ -164,4 +164,4 @@ jobs:
         run: |
           . venv/bin/activate
           pip install -e .
-          pytest -m primer_external_batch_two --primer-external -n auto
+          pytest -m primer_external_batch_two --primer-external -n auto -s
