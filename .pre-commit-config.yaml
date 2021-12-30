@@ -62,7 +62,7 @@ repos:
             "--load-plugins=pylint.extensions.docparams",
           ]
         # disabled plugins: pylint.extensions.mccabe
-        exclude: tests/functional/|tests/input|tests/extensions/data|tests/regrtest_data/|tests/data/|doc/
+        exclude: tests/functional/|tests/input|tests/regrtest_data/|tests(/\w*)*/data/|doc/
       - id: fix-documentation
         name: Fix documentation
         entry: python3 -m script.fix_documentation

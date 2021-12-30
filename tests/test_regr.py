@@ -145,6 +145,7 @@ def test_pylint_config_attr() -> None:
         "BaseTokenChecker",
         "BaseChecker",
         "OptionsProviderMixIn",
+        "_ArgumentsManager",
     ]
     assert [c.name for c in pylinter.ancestors()] == expect
     assert list(astroid.Instance(pylinter).getattr("config"))
