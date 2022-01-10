@@ -13,3 +13,4 @@ import distutils.version
 from distutils.util import strtobool
 from distutils import doesnottexists # [no-name-in-module]
 from distutils.doesnottexists import nope # [no-name-in-module, import-error]
+import distutils.util
