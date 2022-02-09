@@ -54,6 +54,7 @@ jobs:
           . venv/bin/activate
           python -m pip install -U pip setuptools wheel
           pip install -U -r requirements_test.txt
+          python tmp/check_parallel.py
       - name: Generate pre-commit restore key
         id: generate-pre-commit-key
         run: >-
@@ -190,6 +191,7 @@ jobs:
           . venv/bin/activate
           python -m pip install -U pip setuptools wheel
           pip install -U -r requirements_test.txt
+          python tmp/check_parallel.py
 
   pytest-linux:
     name: tests / run / ${{ matrix.python-version }} / Linux
@@ -372,6 +374,7 @@ jobs:
           . venv\\Scripts\\activate
           python -m pip install -U pip setuptools wheel
           pip install -U -r requirements_test_min.txt
+          python tmp/check_parallel.py
 
   pytest-windows:
     name: tests / run / ${{ matrix.python-version }} / Windows
@@ -456,6 +459,7 @@ jobs:
           . venv/bin/activate
           python -m pip install -U pip setuptools wheel
           pip install -U -r requirements_test_min.txt
+          python tmp/check_parallel.py
 
   pytest-pypy:
     name: tests / run / ${{ matrix.python-version }} / Linux
