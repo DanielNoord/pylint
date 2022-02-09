@@ -224,7 +224,9 @@ jobs:
       - name: Run pytest
         run: |
           . venv/bin/activate
-          pytest --benchmark-disable --cov --cov-report= tests/
+          pytest --benchmark-disable -vv --trace-config --debug --cov --cov-report=
+      - name: cat log file
+        run: cat pytestdebug.log
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2.3.1
         with:
@@ -408,7 +410,9 @@ jobs:
       - name: Run pytest
         run: |
           . venv\\Scripts\\activate
-          pytest --benchmark-disable tests/
+          pytest --benchmark-disable -vv --trace-config --debug
+      - name: cat log file
+        run: type pytestdebug.log
 
   prepare-tests-pypy:
     name: tests / prepare / ${{ matrix.python-version }} / Linux
@@ -486,4 +490,6 @@ jobs:
       - name: Run pytest
         run: |
           . venv/bin/activate
-          pytest --benchmark-disable tests/
+          pytest --benchmark-disable -vv --trace-config --debug
+      - name: cat log file
+        run: cat pytestdebug.log
