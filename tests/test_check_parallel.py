@@ -500,68 +500,68 @@ class TestCheckParallel:
     #         expected_stats
     #     ), "The lint is returning unexpected results, has something changed?"
 
-    @pytest.mark.parametrize(
-        "num_files,num_jobs,num_checkers",
-        [
-            (2, 2, 1),
-            (2, 2, 2),
-            (2, 2, 3),
-            (3, 2, 1),
-            (3, 2, 2),
-            (3, 2, 3),
-            (3, 1, 1),
-            (3, 1, 2),
-            (3, 1, 3),
-            (3, 5, 1),
-            (3, 5, 2),
-            (3, 5, 3),
-            (10, 2, 1),
-            (10, 2, 2),
-            (10, 2, 3),
-            (2, 10, 1),
-            (2, 10, 2),
-            (2, 10, 3),
-        ],
-    )
-    def test_map_reduce(self, num_files, num_jobs, num_checkers):
-        """Compares the 3 key parameters for check_parallel() produces the same results
+    # @pytest.mark.parametrize(
+    #     "num_files,num_jobs,num_checkers",
+    #     [
+    #         (2, 2, 1),
+    #         (2, 2, 2),
+    #         (2, 2, 3),
+    #         (3, 2, 1),
+    #         (3, 2, 2),
+    #         (3, 2, 3),
+    #         (3, 1, 1),
+    #         (3, 1, 2),
+    #         (3, 1, 3),
+    #         (3, 5, 1),
+    #         (3, 5, 2),
+    #         (3, 5, 3),
+    #         (10, 2, 1),
+    #         (10, 2, 2),
+    #         (10, 2, 3),
+    #         (2, 10, 1),
+    #         (2, 10, 2),
+    #         (2, 10, 3),
+    #     ],
+    # )
+    # def test_map_reduce(self, num_files, num_jobs, num_checkers):
+    #     """Compares the 3 key parameters for check_parallel() produces the same results
 
-        The intent here is to validate the reduce step: no stats should be lost.
+    #     The intent here is to validate the reduce step: no stats should be lost.
 
-        Checks regression of https://github.com/PyCQA/pylint/issues/4118
-        """
+    #     Checks regression of https://github.com/PyCQA/pylint/issues/4118
+    #     """
 
-        # define the stats we expect to get back from the runs, these should only vary
-        # with the number of files.
-        file_infos = _gen_file_datas(num_files)
+    #     # define the stats we expect to get back from the runs, these should only vary
+    #     # with the number of files.
+    #     file_infos = _gen_file_datas(num_files)
 
-        # Loop for single-proc and mult-proc, so we can ensure the same linter-config
-        for do_single_proc in range(2):
-            linter = PyLinter(reporter=Reporter())
+    #     # Loop for single-proc and mult-proc, so we can ensure the same linter-config
+    #     for do_single_proc in range(2):
+    #         linter = PyLinter(reporter=Reporter())
 
-            # Assign between 1 and 3 checkers to the linter, they should not change the
-            # results of the lint
-            linter.register_checker(ParallelTestChecker(linter))
-            if num_checkers > 1:
-                linter.register_checker(ExtraParallelTestChecker(linter))
-            if num_checkers > 2:
-                linter.register_checker(ThirdParallelTestChecker(linter))
+    #         # Assign between 1 and 3 checkers to the linter, they should not change the
+    #         # results of the lint
+    #         linter.register_checker(ParallelTestChecker(linter))
+    #         if num_checkers > 1:
+    #             linter.register_checker(ExtraParallelTestChecker(linter))
+    #         if num_checkers > 2:
+    #             linter.register_checker(ThirdParallelTestChecker(linter))
 
-            if do_single_proc:
-                # establish the baseline
-                assert (
-                    linter.config.jobs == 1
-                ), "jobs>1 are ignored when calling _check_files"
-                linter._check_files(linter.get_ast, file_infos)
-                stats_single_proc = linter.stats
-            else:
-                check_parallel(
-                    linter,
-                    jobs=num_jobs,
-                    files=file_infos,
-                    arguments=None,
-                )
-                stats_check_parallel = linter.stats
-        assert str(stats_single_proc.by_msg) == str(
-            stats_check_parallel.by_msg
-        ), "Single-proc and check_parallel() should return the same thing"
+    #         if do_single_proc:
+    #             # establish the baseline
+    #             assert (
+    #                 linter.config.jobs == 1
+    #             ), "jobs>1 are ignored when calling _check_files"
+    #             linter._check_files(linter.get_ast, file_infos)
+    #             stats_single_proc = linter.stats
+    #         else:
+    #             check_parallel(
+    #                 linter,
+    #                 jobs=num_jobs,
+    #                 files=file_infos,
+    #                 arguments=None,
+    #             )
+    #             stats_check_parallel = linter.stats
+    #     assert str(stats_single_proc.by_msg) == str(
+    #         stats_check_parallel.by_msg
+    #     ), "Single-proc and check_parallel() should return the same thing"
