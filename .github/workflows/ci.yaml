@@ -194,7 +194,7 @@ jobs:
   pytest-linux:
     name: tests / run / ${{ matrix.python-version }} / Linux
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     needs: prepare-tests-linux
     strategy:
       fail-fast: false
@@ -376,7 +376,7 @@ jobs:
   pytest-windows:
     name: tests / run / ${{ matrix.python-version }} / Windows
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     needs: prepare-tests-windows
     strategy:
       fail-fast: false
@@ -460,7 +460,7 @@ jobs:
   pytest-pypy:
     name: tests / run / ${{ matrix.python-version }} / Linux
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     needs: prepare-tests-pypy
     strategy:
       fail-fast: false
