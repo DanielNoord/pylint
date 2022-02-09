@@ -226,7 +226,7 @@ jobs:
           . venv/bin/activate
           pytest --benchmark-disable -vv --trace-config --debug --cov --cov-report=
       - name: cat log file
-        run: cat pytestdebug.log
+        run: python tmp/check_parallel.py
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2.3.1
         with:
@@ -412,7 +412,7 @@ jobs:
           . venv\\Scripts\\activate
           pytest --benchmark-disable -vv --trace-config --debug
       - name: cat log file
-        run: type pytestdebug.log
+        run: python tmp/check_parallel.py
 
   prepare-tests-pypy:
     name: tests / prepare / ${{ matrix.python-version }} / Linux
@@ -492,4 +492,4 @@ jobs:
           . venv/bin/activate
           pytest --benchmark-disable -vv --trace-config --debug
       - name: cat log file
-        run: cat pytestdebug.log
+        run: python tmp/check_parallel.py
