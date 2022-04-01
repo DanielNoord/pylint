@@ -103,7 +103,7 @@ class OutputLine(NamedTuple):
         """
         if not PY38_PLUS:
             # We check the column only for the new better ast parser introduced in python 3.8
-            return 0  # pragma: no cover
+            return 0
         return int(column)
 
     @staticmethod
@@ -112,7 +112,7 @@ class OutputLine(NamedTuple):
         `min_pyver_end_position`.
         """
         if not check_endline:
-            return None  # pragma: no cover
+            return None
         return value
 
     @classmethod
