@@ -552,6 +552,33 @@ class PyLinter(  # type: ignore[misc]
                     ),
                 },
             ),
+            (
+                "ignored-modules",
+                {
+                    "default": (),
+                    "type": "csv",
+                    "metavar": "<module names>",
+                    "help": "List of module names for which member attributes "
+                    "should not be checked (useful for modules/projects "
+                    "where namespaces are manipulated during runtime and "
+                    "thus existing member attributes cannot be "
+                    "deduced by static analysis). It supports qualified "
+                    "module names, as well as Unix pattern matching.",
+                },
+            ),
+            (
+                "analyse-fallback-blocks",
+                {
+                    "default": False,
+                    "type": "yn",
+                    "metavar": "<y or n>",
+                    "help": "Analyse import fallback blocks. This can be used to "
+                    "support both Python 2 and 3 compatible code, which "
+                    "means that the block might have code that exists "
+                    "only in one or another interpreter, leading to false "
+                    "positives when analysed.",
+                },
+            ),
         )
 
     option_groups_descs = {
@@ -783,14 +810,8 @@ class PyLinter(  # type: ignore[misc]
         self._checkers[checker.name].append(checker)
         for r_id, r_title, r_cb in checker.reports:
             self.register_report(r_id, r_title, r_cb, checker)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            self.register_options_provider(checker)
         if hasattr(checker, "msgs"):
             self.msgs_store.register_messages_from_checker(checker)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            checker.load_defaults()
         # Register the checker, but disable all of its messages.
         if not getattr(checker, "enabled", True):
             self.disable(checker.name)
