@@ -8,6 +8,7 @@ import abc
 import functools
 import warnings
 from inspect import cleandoc
+from tokenize import TokenInfo
 from typing import TYPE_CHECKING, Any
 
 from astroid import nodes
@@ -201,17 +202,18 @@ class BaseChecker(_ArgumentsProvider):
         error_msg += f"Choose from {[m.msgid for m in self.messages]}."
         raise InvalidMessageError(error_msg)
 
-    def open(self):
+    def open(self) -> None:
         """Called before visiting project (i.e. set of modules)."""
 
-    def close(self):
+    def close(self) -> None:
         """Called after visiting project (i.e set of modules)."""
 
 
 class BaseTokenChecker(BaseChecker):
     """Base class for checkers that want to have access to the token stream."""
 
-    def process_tokens(self, tokens):
+    @abc.abstractmethod
+    def process_tokens(self, tokens: list[TokenInfo]) -> None:
         """Should be overridden by subclasses."""
         raise NotImplementedError()
 
