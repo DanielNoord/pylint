@@ -18,7 +18,7 @@ from astroid import nodes
 
 import pylint.interfaces
 import pylint.lint.parallel
-from pylint.checkers.base_checker import BaseChecker
+from pylint.checkers.base_checker import BaseRawFileChecker
 from pylint.checkers.mapreduce_checker import MapReduceMixin
 from pylint.lint import PyLinter
 from pylint.lint.parallel import _worker_check_single_file as worker_check_single_file
@@ -46,10 +46,8 @@ def _gen_file_datas(count: int = 1) -> list[FileItem]:
     return [_gen_file_data(idx) for idx in range(count)]
 
 
-class SequentialTestChecker(BaseChecker):
+class SequentialTestChecker(BaseRawFileChecker):
     """A checker that does not need to consolidate data across run invocations."""
-
-    __implements__ = (pylint.interfaces.IRawChecker,)
 
     name = "sequential-checker"
     test_data = "sequential"
@@ -73,7 +71,7 @@ class SequentialTestChecker(BaseChecker):
         self.data.append(record)
 
 
-class ParallelTestChecker(BaseChecker, MapReduceMixin):
+class ParallelTestChecker(BaseRawFileChecker, MapReduceMixin):
     """A checker that does need to consolidate data.
 
     To simulate the need to consolidate data, this checker only
@@ -87,8 +85,6 @@ class ParallelTestChecker(BaseChecker, MapReduceMixin):
     raised from the individual process, all messages will be raised
     from reduce_map_data.
     """
-
-    __implements__ = (pylint.interfaces.IRawChecker,)
 
     name = "parallel-checker"
     test_data = "parallel"

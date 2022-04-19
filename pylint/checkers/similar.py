@@ -48,7 +48,7 @@ import astroid
 from astroid import nodes
 
 from pylint.checkers import BaseChecker, MapReduceMixin, table_lines_from_stats
-from pylint.interfaces import IRawChecker
+from pylint.checkers.base_checker import BaseRawFileChecker
 from pylint.reporters.ureports.nodes import Table
 from pylint.typing import Options
 from pylint.utils import LinterStats, decoding_stream
@@ -727,14 +727,13 @@ def report_similarities(
 
 
 # wrapper to get a pylint checker from the similar class
-class SimilarChecker(BaseChecker, Similar, MapReduceMixin):
+class SimilarChecker(BaseRawFileChecker, Similar, MapReduceMixin):
     """Checks for similarities and duplicated code.
 
     This computation may be memory / CPU intensive, so you
     should disable it if you experiment some problems.
     """
 
-    __implements__ = (IRawChecker,)
     # configuration section name
     name = "similarities"
     # messages

@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING
 from astroid import nodes
 
 from pylint.checkers import BaseTokenChecker
+from pylint.checkers.base_checker import BaseRawFileChecker
 from pylint.checkers.utils import (
     check_messages,
     is_overload_stub,
@@ -27,7 +28,7 @@ from pylint.checkers.utils import (
     node_frame_class,
 )
 from pylint.constants import WarningScope
-from pylint.interfaces import IAstroidChecker, IRawChecker
+from pylint.interfaces import IAstroidChecker
 from pylint.utils.pragma_parser import OPTION_PO, PragmaParserError, parse_pragma
 
 if TYPE_CHECKING:
@@ -195,7 +196,7 @@ class TokenWrapper:
         return self._tokens[idx][4]
 
 
-class FormatChecker(BaseTokenChecker):
+class FormatChecker(BaseTokenChecker, BaseRawFileChecker):
     """Formatting checker.
 
     Checks for :
@@ -204,7 +205,7 @@ class FormatChecker(BaseTokenChecker):
     * line length
     """
 
-    __implements__ = (IAstroidChecker, IRawChecker)
+    __implements__ = IAstroidChecker
 
     # configuration section name
     name = "format"
