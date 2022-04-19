@@ -12,8 +12,8 @@ from typing import TYPE_CHECKING
 
 from astroid import nodes
 
-from pylint.checkers import BaseChecker
-from pylint.interfaces import IRawChecker, ITokenChecker
+from pylint.checkers import BaseChecker, BaseTokenChecker
+from pylint.interfaces import IRawChecker
 from pylint.typing import ManagedMessage
 from pylint.utils.pragma_parser import OPTION_PO, PragmaParserError, parse_pragma
 
@@ -53,7 +53,7 @@ class ByIdManagedMessagesChecker(BaseChecker):
         self._clear_by_id_managed_msgs()
 
 
-class EncodingChecker(BaseChecker):
+class EncodingChecker(BaseTokenChecker):
 
     """BaseChecker for encoding issues.
 
@@ -62,7 +62,7 @@ class EncodingChecker(BaseChecker):
     * encoding issues.
     """
 
-    __implements__ = (IRawChecker, ITokenChecker)
+__implements__ = (IRawChecker)
 
     # configuration section name
     name = "miscellaneous"

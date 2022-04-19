@@ -27,7 +27,7 @@ from pylint.checkers.utils import (
     node_frame_class,
 )
 from pylint.constants import WarningScope
-from pylint.interfaces import IAstroidChecker, IRawChecker, ITokenChecker
+from pylint.interfaces import IAstroidChecker, IRawChecker
 from pylint.utils.pragma_parser import OPTION_PO, PragmaParserError, parse_pragma
 
 if TYPE_CHECKING:
@@ -204,7 +204,7 @@ class FormatChecker(BaseTokenChecker):
     * line length
     """
 
-    __implements__ = (ITokenChecker, IAstroidChecker, IRawChecker)
+    __implements__ = (IAstroidChecker, IRawChecker)
 
     # configuration section name
     name = "format"

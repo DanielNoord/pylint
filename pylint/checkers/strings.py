@@ -619,7 +619,7 @@ class StringFormatChecker(BaseChecker):
 class StringConstantChecker(BaseTokenChecker):
     """Check string literals."""
 
-    __implements__ = (IAstroidChecker, ITokenChecker, IRawChecker)
+    __implements__ = (IAstroidChecker, IRawChecker)
     name = "string"
     msgs = {
         "W1401": (
