@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import abc
 import functools
 import warnings
 from inspect import cleandoc
@@ -212,4 +213,16 @@ class BaseTokenChecker(BaseChecker):
 
     def process_tokens(self, tokens):
         """Should be overridden by subclasses."""
+        raise NotImplementedError()
+
+
+class BaseRawFileChecker(BaseChecker):
+    """Base class for checkers which need to parse the raw file."""
+
+    @abc.abstractmethod
+    def process_module(self, node: nodes.Module) -> None:
+        """Process a module.
+
+        The module's content is accessible via ``astroid.stream``
+        """
         raise NotImplementedError()
