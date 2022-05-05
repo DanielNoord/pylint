@@ -21,6 +21,11 @@ Release date: TBA
 
   Closes #6169
 
+* Fix saving of persistent data files on installations where the user's cache
+  directory and the linted file are on a different drive.
+
+  Closes #6394
+
 * ``Pylint`` now requires Python 3.7.2 or newer to run.
 
   Closes #4301

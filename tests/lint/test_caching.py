@@ -18,15 +18,23 @@ PYLINT_HOME_PATH = Path(PYLINT_HOME)
 
 
 @pytest.mark.parametrize(
-    "path,recur,expected",
+    "path,recur,pylint_home,expected",
     [
-        ["", 1, PYLINT_HOME_PATH / "_1.stats"],
-        ["", 2, PYLINT_HOME_PATH / "_2.stats"],
-        ["a/path", 42, PYLINT_HOME_PATH / "a_path_42.stats"],
+        ["", 1, PYLINT_HOME_PATH, PYLINT_HOME_PATH / "_1.stats"],
+        ["", 2, PYLINT_HOME_PATH, PYLINT_HOME_PATH / "_2.stats"],
+        ["a/path", 42, PYLINT_HOME_PATH, PYLINT_HOME_PATH / "a_path_42.stats"],
+        [
+            "D:/MyDir/test.py",
+            1,
+            Path("C:/Users/MyPylintHome"),
+            Path("C:/Users/MyPylintHome") / "D__MyDir_test.py_1.stats",
+        ],
     ],
 )
-def test__get_pdata_path(path: str, recur: int, expected: Path) -> None:
-    assert _get_pdata_path(Path(path), recur) == expected
+def test__get_pdata_path(
+    path: str, recur: int, pylint_home: Path, expected: Path
+) -> None:
+    assert _get_pdata_path(Path(path), recur, pylint_home) == expected
 
 
 @pytest.fixture

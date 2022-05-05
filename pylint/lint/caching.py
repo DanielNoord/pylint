@@ -16,7 +16,7 @@ from pylint.utils import LinterStats
 def _get_pdata_path(
     base_name: Path, recurs: int, pylint_home: Path = Path(PYLINT_HOME)
 ) -> Path:
-    underscored_name = "_".join(str(p) for p in base_name.parts)
+    underscored_name = "_".join(str(p.replace(":", "_")) for p in base_name.parts)
     return pylint_home / f"{underscored_name}_{recurs}.stats"
 
 

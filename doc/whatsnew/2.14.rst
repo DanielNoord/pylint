@@ -157,6 +157,11 @@ Other Changes
   Closes #5283
   Closes #1887
 
+* Fix saving of persistent data files on installations where the user's cache
+  directory and the linted file are on a different drive.
+
+  Closes #6394
+
 * Fixed failure to enable ``deprecated-module`` after a ``disable=all``
   by making ``ImportsChecker`` solely responsible for emitting ``deprecated-module`` instead
   of sharing responsibility with ``StdlibChecker``. (This could have led to double messages.)
