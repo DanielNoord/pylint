@@ -24,12 +24,12 @@ jobs:
           script: |
             // Download workflow pylint output
             const fs = require('fs');
-            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            const artifacts_workflow = await github.rest.actions.listWorkflowRunArtifacts({
                owner: context.repo.owner,
                repo: context.repo.repo,
                run_id: ${{ github.event.workflow_run.id }},
             });
-            const [matchArtifact] = artifacts.data.artifacts.filter((artifact) =>
+            const [matchArtifact] = artifacts_workflow.data.artifacts.filter((artifact) =>
               artifact.name == "primer_pylint_output");
             const download = await github.actions.downloadArtifact({
                owner: context.repo.owner,
@@ -42,11 +42,11 @@ jobs:
             // Download 'main' pylint output
             const { Octokit } = require("@octokit/rest");
             const octokit = new Octokit({});
-            const artifacts = await octokit.rest.actions.listArtifactsForRepo({
+            const artifacts_main = await octokit.rest.actions.listArtifactsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            console.log(artifacts)
+            console.log(artifacts_main)
       - run: unzip workflow_pylint_output.zip
       # Compare diff from workflow against diff on 'main'
       - name: Post comment
