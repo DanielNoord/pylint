@@ -1,0 +1,75 @@
+# Most of this is inspired by the mypy primer
+# See: https://github.com/hauntsaninja/mypy_primer
+
+name: Primer / Comment
+
+on:
+  workflow_run:
+    workflows: [Primer / Run]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  primer-comment:
+    name: Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download diffs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Download workflow pylint output
+            const fs = require('fs');
+            const artifacts = await github.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{ github.event.workflow_run.id }},
+            });
+            const [matchArtifact] = artifacts.data.artifacts.filter((artifact) =>
+              artifact.name == "primer_pylint_output");
+            const download = await github.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: "zip",
+            });
+            fs.writeFileSync("workflow_pylint_output.zip", Buffer.from(download.data));
+
+      - run: unzip workflow_pylint_output.zip
+      # Compare diff from workflow against diff on 'main'
+      - name: Post comment
+        id: post-comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs')
+            const data = fs.readFileSync('output.txt', { encoding: 'utf8' })
+            console.log("Diff from primer:")
+            console.log(data)
+            let body
+            if (data.trim()) {
+              body = 'Diff from the primer, showing the effect of this PR on open source code:\n' + data
+            } else {
+              body = 'According to the primer, this change has no effect on the checked open source code. 🤖🎉'
+            }
+            const prNumber = parseInt(fs.readFileSync("pr_number.txt", { encoding: "utf8" }))
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            })
+            return prNumber
+      - name: Hide old comments
+        # Taken from mypy primer
+        # v0.3.0
+        uses: kanga333/comment-hider@bbdf5b562fbec24e6f60572d8f712017428b92e0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          leave_visible: 1
+          issue_number: ${{ steps.post-comment.outputs.result }}
