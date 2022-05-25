@@ -1,7 +1,7 @@
 # Most of this is inspired by the mypy primer
 # See: https://github.com/hauntsaninja/mypy_primer
 
-name: Primer / Run
+name: Primer / Main
 
 on:
   push:
