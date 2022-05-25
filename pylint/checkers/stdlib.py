@@ -563,16 +563,6 @@ class StdlibChecker(DeprecatedMixin, BaseChecker):
 
                     # Check if there is a maxsize argument set to None in the call
                     if q_name in LRU_CACHE and isinstance(d_node, nodes.Call):
-                        try:
-                            arg = utils.get_argument_from_call(
-                                d_node, position=0, keyword="maxsize"
-                            )
-                        except utils.NoSuchArgumentError:
-                            break
-
-                        if not isinstance(arg, nodes.Const) or arg.value is not None:
-                            break
-
                         lru_cache_nodes.append(d_node)
                         break
 
