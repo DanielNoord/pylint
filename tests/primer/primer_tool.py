@@ -161,7 +161,9 @@ class Primer:
             comment += f"\n\n**Effect on [{package}]({self.packages[package].url}):**\n"
 
             if missing_messages:
-                comment += "The following messages are no longer emitted:\n"
+                comment += (
+                    "The following messages are no longer emitted:\n\n<details>\n\n"
+                )
                 print("No longer emitted:")
             count = 1
             for message in missing_messages:
@@ -169,23 +171,26 @@ class Primer:
                 filepath = str(message["path"]).replace(
                     str(package_data.clone_directory), ""
                 )
-                comment += f"{package_data.url}/blob/{package_data.branch}/{filepath}#L{message['line']}\n"
+                comment += f"{package_data.url}/blob/{package_data.branch}{filepath}#L{message['line']}\n"
                 count += 1
                 print(message)
-            comment += "\n"
+            if missing_messages:
+                comment += "\n</details>\n"
 
             count = 1
             if new_messages:
-                comment += "The following messages are now emitted:\n"
+                comment += "The following messages are now emitted:\n\n<details>\n\n"
                 print("Now emitted:")
             for message in new_messages:
                 comment += f"{count}) {message['symbol']}:\n*{message['message']}*\n"
                 filepath = str(message["path"]).replace(
                     str(package_data.clone_directory), ""
                 )
-                comment += f"{package_data.url}/blob/{package_data.branch}/{filepath}#L{message['line']}\n"
+                comment += f"{package_data.url}/blob/{package_data.branch}{filepath}#L{message['line']}\n"
                 count += 1
                 print(message)
+            if new_messages:
+                comment += "\n</details>\n"
 
         if comment == "":
             comment = "🤖 According to the primer, this change has **no effect** on the checked open source code. 🤖🎉"
@@ -201,7 +206,8 @@ class Primer:
         # We want to test all the code we can
         enables = ["--enable-all-extensions", "--enable=all"]
         # Duplicate code takes too long and is relatively safe
-        disables = ["--disable=duplicate-code"]
+        # TODO: Find a way to allow cyclic-import and compare output correctly
+        disables = ["--disable=duplicate-code,cyclic-import"]
         arguments = data.pylint_args + enables + disables
         if data.pylintrc_relpath:
             arguments += [f"--rcfile={data.pylintrc_relpath}"]
