@@ -107,12 +107,10 @@ jobs:
           . venv/bin/activate
           coverage combine coverage*/.coverage
           coverage report --rcfile=${{ env.COVERAGERC_FILE }}
-      - name: Upload coverage to Coveralls
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          . venv/bin/activate
-          coveralls --rcfile=${{ env.COVERAGERC_FILE }} --service=github
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          verbose: true
 
   benchmark-linux:
     name: run benchmark / ${{ matrix.python-version }} / Linux
