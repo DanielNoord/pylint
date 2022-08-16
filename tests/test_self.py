@@ -977,7 +977,7 @@ a.py:1:4: E0001: Parsing failed: 'invalid syntax (<unknown>, line 1)' (syntax-er
         """Fatal errors in one of several modules linted still exits non-zero."""
         valid_path = join(HERE, "conftest.py")
         invalid_path = join(HERE, "garbagePath.py")
-        self._runtest([valid_path, invalid_path, "--disable=C"], code=1)
+        self._runtest([valid_path, invalid_path, "--disable=C"], code=5)
 
     @pytest.mark.parametrize(
         "args, expected",
