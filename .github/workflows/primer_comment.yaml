@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 16
       - run: npm install @octokit/rest
-      - name: Check out code from GitHub
+      - name: Check out code from GitHub TEST CHANGE
         uses: actions/checkout@v3.0.2
       - name: Set up Python 3.10
         id: python
