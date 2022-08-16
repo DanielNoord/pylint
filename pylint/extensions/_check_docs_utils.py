@@ -2,7 +2,10 @@
 # For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
 # Copyright (c) https://github.com/PyCQA/pylint/blob/main/CONTRIBUTORS.txt
 
-"""Utility methods for docstring checking. OTHER CHANGE"""
+"""Utility methods for docstring checking.
+
+OTHER CHANGE
+"""
 
 from __future__ import annotations
 
